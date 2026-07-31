@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  GraduationCap
+  GraduationCap,
+  Activity
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -28,6 +29,7 @@ const Sidebar = () => {
     { name: 'AI Assistant', path: '/assistant', icon: MessageSquarePlus },
     { name: 'Tasks Planner', path: '/tasks', icon: CheckSquare },
     { name: 'Analytics', path: '/analytics', icon: BarChart3 },
+    { name: 'Health Check', path: '/health', icon: Activity },
   ];
 
   const handleMobileLinkClick = () => {
@@ -46,7 +48,7 @@ const Sidebar = () => {
             StudyAI
           </span>
         </Link>
-
+        
         <div className="flex items-center gap-3">
           {/* Quick Theme Toggle */}
           <button

@@ -45,6 +45,12 @@ const Navbar = () => {
         >
           Dashboard
         </Link>
+        <Link 
+          to="/health"
+          className="text-sm font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors"
+        >
+          Health Check
+        </Link>
       </div>
 
       {/* Action Buttons */}
