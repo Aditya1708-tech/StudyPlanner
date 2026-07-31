@@ -22,6 +22,16 @@ StudyAI Planner is a **production-quality React application** designed as an all
 | **Planner & Tasks** | Category-filtered target organizer | Subject tags, due-date counters, priority levels, estimated study time logs, and spring animations. |
 | **Insights & Analytics** | Visual diagnostics panel | Semiautomatic weekly logs chart, subject breakdown gauges, and generative study productivity suggestions. |
 
+## Health Check
+
+A simple health-check page is available at `/health`.
+
+It fetches sample JSON data from:
+
+https://jsonplaceholder.typicode.com/todos/1
+
+This demonstrates client-side data fetching and verifies that external API requests are working correctly in the deployed application.
+
 ---
 
 ## 🎨 Premium Design System
