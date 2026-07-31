@@ -6,6 +6,9 @@ import Dashboard from './pages/Dashboard';
 import Assistant from './pages/Assistant';
 import Tasks from './pages/Tasks';
 import Analytics from './pages/Analytics';
+import HealthCheck from "./pages/HealthCheck";
+
+
 
 function App() {
   return (
@@ -19,6 +22,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
           {/* Fallback route */}
           <Route path="*" element={<Landing />} />
+          <Route path="/health" element={<HealthCheck />} />
         </Routes>
       </Router>
     </StudyProvider>
