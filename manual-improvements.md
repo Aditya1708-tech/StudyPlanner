@@ -32,6 +32,12 @@ To ensure this application meets professional standards for a high-quality front
   Ensured every interactive icon-only button (like the theme toggler or mobile menu button) includes explicit `aria-label` descriptors to support screen readers.
 - **Color Contrast Assurance**:
   Selected color combinations (slate, indigo, and emerald against white or space-gray) to maintain legibility.
+- **Tailwind CSS v4 Class-Based Dark Mode Enforcer**:
+  In Tailwind v4, the `dark:` variant default behavior uses media queries (`prefers-color-scheme: dark`) to detect OS preferences rather than a custom HTML class. If a student's OS is in dark mode, standard Tailwind `dark:` text rules are applied even if the dashboard theme toggle is set to light mode, resulting in unreadable white text on a light background. We resolved this by overriding the dark variant in the CSS entrypoint:
+  ```css
+  @custom-variant dark (&:where(.dark, .dark *));
+  ```
+  This forces dark styles to only manifest when the `.dark` class is explicitly present on the document node, preserving theme styling.
 
 ---
 
