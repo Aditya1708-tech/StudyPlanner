@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { Task, Exam, ChatMessage, PlannerInput, StudyDay, StudyPlanMetadata } from '../types';
 import { useToast } from './ToastContext';
+import { getSimpleHash, SeededRandom } from '../utils/random';
 
 interface StudyContextType {
   theme: string;
@@ -231,29 +232,92 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const generateAIResponse = useCallback((userText: string) => {
     const textLower = userText.toLowerCase();
+    
+    // Seeded randomness for dynamic replies in demo mode
+    const sortedSubjects = [...plannerInput.subjects].sort();
+    const inputSeed = sortedSubjects.join(',') + `:${plannerInput.dailyHours}`;
+    const seedHash = getSimpleHash(userText + ':' + inputSeed);
+    const rng = new SeededRandom(seedHash);
+
     let reply = "";
     let suggestedTasks: Omit<Task, 'id' | 'completed'>[] | undefined = undefined;
 
+    const motivationalClosing = [
+      " Keep up the great work and stay consistent!",
+      " Remember, steady progress yields the best results.",
+      " You've got this! One step at a time.",
+      " Stay focused, take breaks, and let's achieve your goals!",
+      " We've mapped out the key targets; you're on track to succeed."
+    ];
+
     if (textLower.includes('schedule') || textLower.includes('plan') || textLower.includes('study')) {
-      reply = "I've structured a study plan for your upcoming exams. Based on your current load, you should prioritize Calculus today. Would you like me to schedule a 2-hour review task for Calculus?";
+      const intros = [
+        "I've structured a study plan for your upcoming exams.",
+        "Here is a customized study proposal based on your requirements.",
+        "I've updated your learning roadmap with focused review targets."
+      ];
+      const details = [
+        "Based on your current load, you should prioritize Calculus today. Would you like me to schedule a 2-hour review task for Calculus?",
+        "To maximize efficiency, I suggest allocating a dedicated revision block to Calculus functions today. Should I add this?",
+        "I recommend checking Calculus concepts and working through core problems today. Let's schedule a 2-hour review task."
+      ];
+      
+      reply = rng.select(intros) + " " + rng.select(details) + rng.select(motivationalClosing);
       suggestedTasks = [
-        { title: "Calculus Exam Review (Functions & Integrals)", subject: "Mathematics", priority: "High", estimatedHours: 2, dueDate: new Date().toISOString().split('T')[0] }
+        { title: "Calculus Exam Review (Functions & Integrals)", subject: "Mathematics", priority: rng.select(["High", "Medium"] as const), estimatedHours: 2, dueDate: new Date().toISOString().split('T')[0] }
       ];
     } else if (textLower.includes('chemistry') || textLower.includes('organic')) {
-      reply = "Organic Chemistry Chapter 4 covers electrophilic additions. I recommend outlining the key reaction mechanisms and drawing transition states. Shall we create a Chemistry study session for tomorrow?";
+      const intros = [
+        "Organic Chemistry Chapter 4 covers electrophilic additions.",
+        "We need to tackle electrophilic reaction mechanisms for your Chemistry review.",
+        "To master Chapter 4 Organic Chemistry, visualizing step-by-step pathways is crucial."
+      ];
+      const details = [
+        "I recommend outlining the key reaction mechanisms and drawing transition states. Shall we create a Chemistry study session for tomorrow?",
+        "I suggest practice drawings of the transition states to cement the mechanisms. Shall we add a Chemistry session tomorrow?",
+        "Try drawing electrophilic additions on your scratchpad. I can create a chemistry study task for you tomorrow."
+      ];
+      
+      reply = rng.select(intros) + " " + rng.select(details) + rng.select(motivationalClosing);
       suggestedTasks = [
-        { title: "Draw Organic Chemistry Reaction Mechanisms", subject: "Chemistry", priority: "High", estimatedHours: 1.5, dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0] }
+        { title: "Draw Organic Chemistry Reaction Mechanisms", subject: "Chemistry", priority: rng.select(["High", "Medium"] as const), estimatedHours: 1.5, dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0] }
       ];
     } else if (textLower.includes('calculus') || textLower.includes('math')) {
-      reply = "Calculus III double integrals require visualizing coordinate bounds. I suggest resolving 5 integration sheets. Let's add this task to your planner.";
+      const intros = [
+        "Calculus III double integrals require visualizing coordinate bounds.",
+        "Mastering double integrals in Calculus requires drawing the integration regions.",
+        "Calculus bounds can be tricky to analyze without visual coordinate sheets."
+      ];
+      const details = [
+        "I suggest resolving 5 integration sheets. Let's add this task to your planner.",
+        "I recommend working through 5 integration problems under timed conditions. Shall we add this?",
+        "Try solving 5 practice questions focusing on polar coordinates bounds. Let's schedule this task."
+      ];
+      
+      reply = rng.select(intros) + " " + rng.select(details) + rng.select(motivationalClosing);
       suggestedTasks = [
-        { title: "Solve Double Integrals Worksheet", subject: "Mathematics", priority: "Medium", estimatedHours: 3, dueDate: new Date().toISOString().split('T')[0] }
+        { title: "Solve Double Integrals Worksheet", subject: "Mathematics", priority: rng.select(["Medium", "Low"] as const), estimatedHours: 3, dueDate: new Date().toISOString().split('T')[0] }
       ];
     } else {
-      reply = "I've analyzed your schedule. You have a Chemistry midterm exam coming up in 3 days. I recommend a focused 2-hour session on Molecular Orbitals and synthesis pathway reviews. I can add this study slot to your list directly!";
-      suggestedTasks = [
-        { title: "Study Chemistry Molecular Orbitals", subject: "Chemistry", priority: "High", estimatedHours: 2, dueDate: new Date().toISOString().split('T')[0] }
+      const intros = [
+        "I've analyzed your schedule.",
+        "Looking closely at your task checklist,",
+        "Based on your upcoming deadlines,"
       ];
+      const details = [
+        "You have a Chemistry midterm exam coming up in 3 days. I recommend a focused 2-hour session on Molecular Orbitals and synthesis pathway reviews. I can add this study slot to your list directly!",
+        "Your Chemistry midterm is only 3 days away. I suggest spending 2 hours reviewing Molecular Orbitals and reactions. Let's schedule this session!",
+        "With your Chemistry midterm in 3 days, a 2-hour block on molecular orbital configuration is ideal. Should we insert this task?"
+      ];
+      
+      reply = rng.select(intros) + " " + rng.select(details) + rng.select(motivationalClosing);
+      suggestedTasks = [
+        { title: "Study Chemistry Molecular Orbitals", subject: "Chemistry", priority: rng.select(["High", "Medium"] as const), estimatedHours: 2, dueDate: new Date().toISOString().split('T')[0] }
+      ];
+    }
+
+    if (suggestedTasks) {
+      suggestedTasks = rng.shuffle(suggestedTasks);
     }
 
     const aiMsg: ChatMessage = {
@@ -265,7 +329,7 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     setMessages(prev => [...prev, aiMsg]);
-  }, []);
+  }, [plannerInput]);
 
   const sendChatMessage = useCallback((text: string, sender: 'user' | 'ai' = 'user') => {
     const newMsg: ChatMessage = {
@@ -293,7 +357,7 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const togglePlanTaskComplete = useCallback((dateStr: string, taskId: string) => {
     const day = studyPlan.find(d => d.date === dateStr);
-    const task = day?.tasks.find(t => (t as Task).id === taskId) as Task | undefined;
+    const task = day?.tasks.find(t => t.id === taskId);
     if (!task) return;
     const nextCompleted = !task.completed;
 
@@ -313,7 +377,7 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (d.date === dateStr) {
         return {
           ...d,
-          tasks: d.tasks.map(t => (t as Task).id === taskId ? { ...t, completed: nextCompleted } : t)
+          tasks: d.tasks.map(t => t.id === taskId ? { ...t, completed: nextCompleted } : t)
         };
       }
       return d;

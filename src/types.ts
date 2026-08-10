@@ -34,14 +34,16 @@ export interface PlannerInput {
 
 export interface StudyDay {
   date: string;
-  tasks: Omit<Task, 'id' | 'completed'>[];
+  tasks: Task[];
 }
 
 export interface StudyPlanMetadata {
-  generationSource: 'gemini' | 'cache' | 'fallback';
+  generationSource: 'gemini' | 'cache' | 'fallback' | 'demo';
   promptVersion: string;
   generatedAt: string;
   estimatedDifficulty: 'easy' | 'medium' | 'hard';
+  motivationalIntro?: string;
+  studyStrategy?: string;
 }
 
 export interface StudyPlanResult {

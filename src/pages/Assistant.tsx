@@ -4,6 +4,7 @@ import { useToast } from '../context/ToastContext';
 import Sidebar from '../components/layout/Sidebar';
 import GlassCard from '../components/ui/GlassCard';
 import { Task } from '../types';
+import { ENV } from '../utils/env';
 import { 
   Send, 
   Sparkles, 
@@ -101,7 +102,19 @@ const Assistant: React.FC = () => {
           {/* Page Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="font-heading font-black text-3xl tracking-tight text-slate-900 dark:text-white">AI Study Assistant</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="font-heading font-black text-3xl tracking-tight text-slate-900 dark:text-white">AI Study Assistant</h1>
+                {!ENV.GEMINI_API_KEY && (
+                  <div className="relative group flex items-center shrink-0 mt-1">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 cursor-help shadow-sm">
+                      Demo AI Mode
+                    </span>
+                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 p-2 bg-slate-900 dark:bg-slate-800 text-white text-[10px] rounded-lg shadow-lg z-50 text-center font-normal leading-normal">
+                      Using built-in demo responses. Add a Gemini API key to enable live AI generation.
+                    </div>
+                  </div>
+                )}
+              </div>
               <p className="text-slate-600 dark:text-slate-400 text-sm font-semibold">Ask queries, explain concepts, or auto-schedule study plans.</p>
             </div>
             

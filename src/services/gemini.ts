@@ -2,6 +2,7 @@ import { PlannerInput, StudyDay, Task, StudyPlanResult } from '../types';
 import { logger } from '../utils/logger';
 import { ENV } from '../utils/env';
 import { PROMPT_VERSION, buildPlannerPrompt } from './prompts';
+import { getSimpleHash, SeededRandom } from '../utils/random';
 
 /**
  * Structured Analytics Payload schema.
@@ -11,7 +12,7 @@ interface AnalyticsPayload {
   promptVersion: string;
   cacheKey?: string;
   generationTimeMs?: number;
-  source: 'gemini' | 'cache' | 'fallback';
+  source: 'gemini' | 'cache' | 'fallback' | 'demo';
   error?: string;
 }
 
@@ -82,6 +83,7 @@ export const validateStudyPlan = (data: unknown): { schedule: StudyDay[]; estima
     if (!dayObj.date || typeof dayObj.date !== 'string') {
       return; // Skip invalid days
     }
+    const dateStr = dayObj.date as string;
     
     const rawTasks = dayObj.tasks;
     if (!Array.isArray(rawTasks)) {
@@ -113,10 +115,10 @@ export const validateStudyPlan = (data: unknown): { schedule: StudyDay[]; estima
         : ['Concept review'];
         
       validatedTasks.push({
-        id: `gen-${dayObj.date}-${subject.toLowerCase().replace(/\s+/g, '-')}-${idx}`,
+        id: `gen-${dateStr}-${subject.toLowerCase().replace(/\s+/g, '-')}-${idx}`,
         title: taskObj.title,
         subject,
-        dueDate: dayObj.date,
+        dueDate: dateStr,
         priority,
         estimatedHours,
         completed: false,
@@ -127,7 +129,7 @@ export const validateStudyPlan = (data: unknown): { schedule: StudyDay[]; estima
     
     if (validatedTasks.length > 0) {
       validatedSchedule.push({
-        date: dayObj.date,
+        date: dateStr,
         tasks: validatedTasks
       });
     }
@@ -150,11 +152,52 @@ export const validateStudyPlan = (data: unknown): { schedule: StudyDay[]; estima
   };
 };
 
+const revisionPools: Record<string, string[]> = {
+  Chemistry: [
+    "Organic chemistry mechanisms review",
+    "Chemical kinetics problem solving",
+    "Acid-base titration practice",
+    "Periodic table trends mapping",
+    "Molecular orbitals visualization",
+    "Lab procedures safety check",
+    "Thermodynamics in chemistry drills"
+  ],
+  Mathematics: [
+    "Calculus limits and continuity",
+    "Double integration sheet review",
+    "Differential equations drills",
+    "Linear algebra matrix proofs",
+    "Formula sheet consolidation",
+    "Taylor series expansion checks",
+    "Vector calculus visualizations"
+  ],
+  Physics: [
+    "Kinematics equations review",
+    "Newtonian mechanics diagramming",
+    "Electromagnetic field equations",
+    "Quantum wave functions study",
+    "Optics refraction worksheets",
+    "Formula quick consolidation",
+    "Thermodynamics phase diagrams"
+  ],
+  General: [
+    "Core syllabus checklist overview",
+    "Active recall conceptual drills",
+    "Flashcard matching reviews",
+    "Concept map mapping sessions",
+    "Practice test papers simulation",
+    "Study guide summary reading"
+  ]
+};
+
 /**
  * Fallback study plan generator in case Gemini API is unavailable or returns an error.
  * This generates a high-quality personalized schedule locally using an algorithm.
  */
-export const generateLocalFallbackPlan = (input: PlannerInput): StudyPlanResult => {
+export const generateLocalFallbackPlan = (
+  input: PlannerInput,
+  rng?: SeededRandom
+): StudyPlanResult => {
   const { subjects, examDates, dailyHours } = input;
   const plan: StudyDay[] = [];
   const today = new Date();
@@ -175,7 +218,7 @@ export const generateLocalFallbackPlan = (input: PlannerInput): StudyPlanResult 
     // Synthesis day check (every 4th day)
     const isSynthesisDay = (i + 1) % 4 === 0;
 
-    const dayTasks: Task[] = [];
+    let dayTasks: Task[] = [];
     let hoursAllocated = 0;
     
     // Sort subjects by closest exam date first to prioritize
@@ -235,6 +278,30 @@ export const generateLocalFallbackPlan = (input: PlannerInput): StudyPlanResult 
           revisionBlocks = ["Core concept outline", "Mindmapping"];
         }
         
+        if (rng) {
+          priority = rng.select(['High', 'Medium', 'Low'] as const);
+          
+          const pool = revisionPools[subject] || revisionPools.General;
+          const numBlocks = rng.nextInt(2, 4); // 2 or 3 revision blocks
+          const selectedBlocks: string[] = [];
+          const tempPool = [...pool];
+          for (let b = 0; b < numBlocks && tempPool.length > 0; b++) {
+            const idxBlock = rng.nextInt(0, tempPool.length);
+            selectedBlocks.push(tempPool.splice(idxBlock, 1)[0]);
+          }
+          revisionBlocks = selectedBlocks;
+
+          const actions = [
+            "Deep review of",
+            "Solve past worksheets for",
+            "Synthesize formula sheets for",
+            "Active recall drills on",
+            "Draft summary mindmaps for",
+            "Review tricky homework problems on"
+          ];
+          action = rng.select(actions);
+        }
+        
         dayTasks.push({
           id: `gen-${dateStr}-${subject.toLowerCase().replace(/\s+/g, '-')}-${idx}-fallback`,
           title: `${action} ${subject}`,
@@ -254,13 +321,13 @@ export const generateLocalFallbackPlan = (input: PlannerInput): StudyPlanResult 
     if (dayTasks.length > 0) {
       plan.push({
         date: dateStr,
-        tasks: dayTasks
+        tasks: rng ? rng.shuffle(dayTasks) : dayTasks
       });
     }
   }
 
   // Estimate difficulty based on hour load density
-  const totalAllocated = plan.reduce((sum, d) => sum + d.tasks.reduce((s, t) => s + (t as Task).estimatedHours, 0), 0);
+  const totalAllocated = plan.reduce((sum, d) => sum + d.tasks.reduce((s, t) => s + t.estimatedHours, 0), 0);
   const averageHours = totalAllocated / daysToGenerate;
   let estimatedDifficulty: 'easy' | 'medium' | 'hard' = 'medium';
   if (averageHours > dailyHours * 0.8) {
@@ -328,17 +395,45 @@ export const fetchStudyPlanFromGemini = async (
 
   const apiKey = ENV.GEMINI_API_KEY;
   if (!apiKey) {
-    logger.warn("VITE_GEMINI_API_KEY is not defined. Using local fallback planner.");
     // Wait a brief simulated moment to make the interface loading state smooth
     await new Promise(resolve => setTimeout(resolve, 1500));
-    const fallback = generateLocalFallbackPlan(input);
-    fallback.metadata.generationSource = 'fallback';
+    
+    // Seeded randomness for Demo Mode
+    const sortedSubjects = [...input.subjects].sort();
+    const sortedDates = sortedSubjects.map(sub => `${sub}:${input.examDates[sub] || ''}`).join(',');
+    const seedString = `${sortedSubjects.join(',')}:${sortedDates}:${input.dailyHours}`;
+    const seedHash = getSimpleHash(seedString);
+    const rng = new SeededRandom(seedHash);
+    
+    const fallback = generateLocalFallbackPlan(input, rng);
+    fallback.metadata.generationSource = 'demo';
+    
+    // Deterministic random metadata fields
+    const motivationalIntros = [
+      "Unlock your potential! This study plan is customized to help you master your subjects systematically.",
+      "Success is the sum of small efforts, repeated day in and day out. Let's make every day count!",
+      "Stay focused and excel! We've structured your schedule to maximize retention and keep stress levels low.",
+      "Your academic journey is a marathon, not a sprint. Follow this balanced guide to reach the finish line strong.",
+      "Believe in yourself! Consistency is the key to deep comprehension. Here is your roadmap to success."
+    ];
+    
+    const studyStrategies = [
+      "Focus on active recall and self-testing. When reviewing your notes, close the book and write down everything you remember.",
+      "Utilize space repetition. Revisit difficult chemistry reactions and mathematical proofs 24 hours after your first review.",
+      "Try the Pomodoro Technique: study intensely for 25 minutes, then take a 5-minute break to stay fresh.",
+      "Prioritize solving past exam papers under timed conditions to get comfortable with the exam format.",
+      "Formulate mind maps for complex concept groups to visualize connection nodes and clear up memory bottlenecks."
+    ];
+    
+    fallback.metadata.estimatedDifficulty = rng.select(['easy', 'medium', 'hard'] as const);
+    fallback.metadata.motivationalIntro = rng.select(motivationalIntros);
+    fallback.metadata.studyStrategy = rng.select(studyStrategies);
+    
     logAnalytics({
-      event: 'fallback_used',
+      event: 'generation_succeeded',
       promptVersion: PROMPT_VERSION,
       generationTimeMs: Date.now() - startTime,
-      source: 'fallback',
-      error: 'API key missing'
+      source: 'demo'
     });
     return fallback;
   }

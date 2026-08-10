@@ -273,6 +273,53 @@ describe('Gemini Study Plan Service Tests', () => {
       expect(result.metadata.generationSource).toBe('fallback');
       expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
+
+    it('should use demo mode, return demo generationSource, and behave deterministically when API key is missing', async () => {
+      ENV.GEMINI_API_KEY = '';
+
+      const mockInput1: PlannerInput = {
+        subjects: ['Chemistry', 'Mathematics'],
+        examDates: { 'Chemistry': getFutureDateString(4), 'Mathematics': getFutureDateString(6) },
+        dailyHours: 4
+      };
+
+      const mockInput2: PlannerInput = {
+        subjects: ['Chemistry', 'Mathematics'],
+        examDates: { 'Chemistry': getFutureDateString(4), 'Mathematics': getFutureDateString(6) },
+        dailyHours: 4
+      };
+
+      const mockInput3: PlannerInput = {
+        subjects: ['Physics'],
+        examDates: { 'Physics': getFutureDateString(5) },
+        dailyHours: 4
+      };
+
+      const res1 = await fetchStudyPlanFromGemini(mockInput1, 0);
+      const res2 = await fetchStudyPlanFromGemini(mockInput2, 0);
+      const res3 = await fetchStudyPlanFromGemini(mockInput3, 0);
+
+      // Verify source is 'demo'
+      expect(res1.metadata.generationSource).toBe('demo');
+      expect(res1.metadata.motivationalIntro).toBeTypeOf('string');
+      expect(res1.metadata.studyStrategy).toBeTypeOf('string');
+
+      // Verify deterministic identical output for identical inputs
+      expect(res1.metadata.estimatedDifficulty).toBe(res2.metadata.estimatedDifficulty);
+      expect(res1.metadata.motivationalIntro).toBe(res2.metadata.motivationalIntro);
+      expect(res1.metadata.studyStrategy).toBe(res2.metadata.studyStrategy);
+      
+      // Tasks and blocks should be identical
+      expect(res1.schedule[0].tasks[0].title).toBe(res2.schedule[0].tasks[0].title);
+      expect(res1.schedule[0].tasks[0].priority).toBe(res2.schedule[0].tasks[0].priority);
+      expect(res1.schedule[0].tasks[0].revisionBlocks).toEqual(res2.schedule[0].tasks[0].revisionBlocks);
+
+      // Verify that changing input changes the deterministic output (different seed)
+      const diffOutput = res1.metadata.motivationalIntro !== res3.metadata.motivationalIntro ||
+                         res1.metadata.studyStrategy !== res3.metadata.studyStrategy ||
+                         res1.schedule[0].tasks[0].title !== res3.schedule[0].tasks[0].title;
+      expect(diffOutput).toBe(true);
+    });
   });
 
 });

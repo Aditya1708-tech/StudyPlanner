@@ -131,6 +131,8 @@ const AIPlanner: React.FC = () => {
       const source = apiResult.metadata.generationSource;
       if (source === 'gemini') {
         showToast('AI study plan generated successfully!', 'success');
+      } else if (source === 'demo') {
+        showToast('Demo AI study plan generated!', 'success');
       } else if (source === 'cache') {
         showToast('Study plan loaded from cache', 'success');
       } else {
@@ -257,24 +259,24 @@ const AIPlanner: React.FC = () => {
               </p>
             </div>
             
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel border border-primary-500/10 text-xs font-bold text-primary-655 dark:text-primary-400 self-start shadow-sm">
-              <Sparkles className="w-4 h-4 text-primary-500" />
-              <span>Gemini v2.5 Flash Engine</span>
-            </div>
+            {!ENV.GEMINI_API_KEY ? (
+              <div className="relative group flex items-center shrink-0">
+                <span className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-bold cursor-help shadow-sm">
+                  Demo AI Mode
+                </span>
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 p-2 bg-slate-900 dark:bg-slate-800 text-white text-[10px] rounded-lg shadow-lg z-50 text-center font-normal leading-normal">
+                  Using built-in demo responses. Add a Gemini API key to enable live AI generation.
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel border border-primary-500/10 text-xs font-bold text-primary-655 dark:text-primary-400 self-start shadow-sm">
+                <Sparkles className="w-4 h-4 text-primary-500" />
+                <span>Gemini v2.5 Flash Engine</span>
+              </div>
+            )}
           </div>
 
-          {/* Developer Environment Warning */}
-          {ENV.isDev && !ENV.GEMINI_API_KEY && (
-            <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-bold shadow-sm">
-              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-extrabold">[DEVELOPER NOTICE] VITE_GEMINI_API_KEY is missing.</p>
-                <p className="font-semibold text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                  To enable Gemini-powered scheduling, add <code className="px-1 py-0.5 rounded bg-amber-500/20 dark:bg-amber-500/30 text-amber-900 dark:text-amber-200">VITE_GEMINI_API_KEY</code> to a local <code className="px-1 py-0.5 rounded bg-amber-500/20 dark:bg-amber-500/30 text-amber-900 dark:text-amber-200">.env</code> file. Currently falling back to local scheduling algorithm.
-                </p>
-              </div>
-            </div>
-          )}
+
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
@@ -545,6 +547,8 @@ const AIPlanner: React.FC = () => {
                             ? 'bg-primary-500/10 text-primary-655 dark:text-primary-400 border border-primary-500/15'
                             : studyPlanMetadata.generationSource === 'cache'
                             ? 'bg-emerald-500/10 text-emerald-655 dark:text-emerald-400 border border-emerald-500/15'
+                            : studyPlanMetadata.generationSource === 'demo'
+                            ? 'bg-purple-500/10 text-purple-655 dark:text-purple-400 border border-purple-500/15'
                             : 'bg-amber-500/10 text-amber-655 dark:text-amber-400 border border-amber-500/15'
                         }`}>
                           {studyPlanMetadata.generationSource === 'fallback' ? (
@@ -554,6 +558,7 @@ const AIPlanner: React.FC = () => {
                           )}
                           {studyPlanMetadata.generationSource === 'gemini' && 'AI Generated'}
                           {studyPlanMetadata.generationSource === 'cache' && 'From Cache'}
+                          {studyPlanMetadata.generationSource === 'demo' && 'Demo AI Mode'}
                           {studyPlanMetadata.generationSource === 'fallback' && 'Local Fallback'}
                         </span>
 
@@ -578,6 +583,23 @@ const AIPlanner: React.FC = () => {
                       <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-450">
                         Generated: {studyPlanMetadata.generatedAt}
                       </span>
+                    </GlassCard>
+                  )}
+
+                  {/* AI Study Strategy Guide Card */}
+                  {studyPlanMetadata && studyPlanMetadata.motivationalIntro && (
+                    <GlassCard hover={false} className="p-5 bg-gradient-to-tr from-pink-500/5 to-primary-500/5 border border-pink-500/10 text-xs font-semibold leading-relaxed text-slate-700 dark:text-slate-350">
+                      <p className="font-extrabold text-slate-855 dark:text-white mb-2 flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-primary-500 animate-pulse" />
+                        <span>AI Study Strategy Guide</span>
+                      </p>
+                      <p className="italic text-slate-600 dark:text-slate-450 mb-3">"{studyPlanMetadata.motivationalIntro}"</p>
+                      {studyPlanMetadata.studyStrategy && (
+                        <div className="mt-3 pt-3 border-t border-slate-200/40 dark:border-slate-800/45 text-[11px] text-slate-655 dark:text-slate-400 leading-normal">
+                          <strong className="text-primary-600 dark:text-primary-400 uppercase tracking-wider text-[9px] block mb-1">Recommended Approach</strong>
+                          {studyPlanMetadata.studyStrategy}
+                        </div>
+                      )}
                     </GlassCard>
                   )}
                   
