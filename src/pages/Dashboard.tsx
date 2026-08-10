@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { useStudy } from '../context/StudyContext';
 import Sidebar from '../components/layout/Sidebar';
 import GlassCard from '../components/ui/GlassCard';
+import AnimatedPage from '../components/layout/AnimatedPage';
+import Spotlight from '../components/ui/Spotlight';
 import { 
   Sparkles, 
   Calendar as CalendarIcon, 
@@ -18,6 +20,47 @@ import {
   Bookmark,
   CheckSquare
 } from 'lucide-react';
+
+// Count-Up animation helper component
+const CountUp: React.FC<{ target: number; decimals?: number; suffix?: string }> = ({ target, decimals = 0, suffix = '' }) => {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test') {
+    return <span>{target.toFixed(decimals)}{suffix}</span>;
+  }
+
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    let start = 0;
+    const end = target;
+    if (start === end) {
+      setCount(end);
+      return;
+    }
+    
+    const duration = 800; // ms
+    const steps = 25;
+    const stepTime = duration / steps;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      // Ease out quad
+      const current = start + (end - start) * (progress * (2 - progress));
+      
+      if (step >= steps) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(current);
+      }
+    }, stepTime);
+    
+    return () => clearInterval(timer);
+  }, [target]);
+
+  return <span>{count.toFixed(decimals)}{suffix}</span>;
+};
 
 const Dashboard: React.FC = () => {
   const { 
@@ -41,6 +84,11 @@ const Dashboard: React.FC = () => {
   const [newExamSubject, setNewExamSubject] = useState('');
   const [newExamDate, setNewExamDate] = useState('');
 
+  const [isLoading, setIsLoading] = useState(() => typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test' ? false : true);
+  
+  // Confetti trigger tasks states
+  const [confettiActiveTaskId, setConfettiActiveTaskId] = useState<string | null>(null);
+
   // Local state for subjects onboarding input
   const [obSubject, setObSubject] = useState('');
 
@@ -53,6 +101,12 @@ const Dashboard: React.FC = () => {
 
   const examNameInputRef = useRef<HTMLInputElement>(null);
   const addExamButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Simulated Loader mount delay
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(t);
+  }, []);
 
   // Autofocus exam name when form opens
   useEffect(() => {
@@ -123,6 +177,20 @@ const Dashboard: React.FC = () => {
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     return upcoming.length > 0 ? upcoming[0] : null;
   }, [exams, currentDateStr]);
+
+  // Handler for completing a task and triggering confetti celebration
+  const handleToggleTask = (task: any) => {
+    const willBeCompleted = !task.completed;
+    if (willBeCompleted) {
+      setConfettiActiveTaskId(task.id);
+      setTimeout(() => setConfettiActiveTaskId(null), 800);
+    }
+    if (!task.isGenerated) {
+      toggleTaskComplete(task.id);
+    } else {
+      togglePlanTaskComplete(currentDateStr, task.id);
+    }
+  };
 
   // Handler for adding subject in onboarding card
   const handleAddSubjectOnboarding = (e: React.FormEvent) => {
@@ -253,7 +321,6 @@ const Dashboard: React.FC = () => {
     }
 
     if (chartTab === '30D') {
-      // 4 weekly blocks
       const weeklyBlocks: { label: string; hours: number }[] = [];
       const temp = new Date(currentDateStr);
       for (let w = 0; w < 4; w++) {
@@ -268,7 +335,6 @@ const Dashboard: React.FC = () => {
       return weeklyBlocks.reverse();
     }
 
-    // 90D view: 3 monthly blocks
     const monthlyBlocks: { label: string; hours: number }[] = [];
     const temp = new Date(currentDateStr);
     for (let m = 0; m < 3; m++) {
@@ -286,12 +352,85 @@ const Dashboard: React.FC = () => {
 
   const maxChartHours = Math.max(...chartData.map(d => d.hours), 5);
 
+  // SKELETON RENDER FUNCTIONS
+  const renderMetricSkeletons = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(4)].map((_, i) => (
+        <GlassCard hover={false} key={i} className="flex items-center justify-between p-5 animate-pulse">
+          <div className="space-y-2.5 w-2/3">
+            <div className="h-2.5 bg-border-primary/60 dark:bg-slate-800 rounded-full w-20" />
+            <div className="h-6 bg-border-primary/80 dark:bg-slate-700 rounded-full w-16" />
+            <div className="h-2 bg-border-primary/40 dark:bg-slate-800/60 rounded-full w-24" />
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-border-primary/50 dark:bg-slate-800" />
+        </GlassCard>
+      ))}
+    </div>
+  );
+
+  const renderListSkeleton = () => (
+    <GlassCard hover={false} className="p-6 space-y-5 animate-pulse">
+      <div className="border-b border-border-primary/40 dark:border-border-primary/40 pb-3 flex items-center justify-between">
+        <div className="h-5 bg-border-primary/80 dark:bg-slate-700 rounded-full w-32" />
+        <div className="h-3 bg-border-primary/40 dark:bg-slate-800 rounded-full w-16" />
+      </div>
+      <div className="space-y-3.5">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-center justify-between p-3.5 rounded-xl border border-border-primary/40 dark:border-border-primary/45 bg-surface-primary/10 dark:bg-bg-primary/20">
+            <div className="flex items-center gap-3 w-2/3">
+              <div className="w-5.5 h-5.5 rounded bg-border-primary/60 dark:bg-slate-800 shrink-0" />
+              <div className="space-y-2 w-full">
+                <div className="h-3 bg-border-primary/70 dark:bg-slate-700 rounded w-5/6" />
+                <div className="h-2 bg-border-primary/40 dark:bg-slate-800 rounded w-1/3" />
+              </div>
+            </div>
+            <div className="h-3 bg-border-primary/50 dark:bg-slate-800 rounded w-8" />
+          </div>
+        ))}
+      </div>
+    </GlassCard>
+  );
+
+  const renderCalendarSkeleton = () => (
+    <GlassCard hover={false} className="p-5 space-y-4 animate-pulse">
+      <div className="flex items-center justify-between border-b border-border-primary/40 dark:border-border-primary/40 pb-3">
+        <div className="h-4 bg-border-primary/80 dark:bg-slate-700 rounded w-24" />
+        <div className="h-5 bg-border-primary/40 dark:bg-slate-800 rounded w-14" />
+      </div>
+      <div className="h-4 bg-border-primary/60 dark:bg-slate-800 rounded w-32 mx-auto" />
+      <div className="grid grid-cols-7 gap-1 text-center">
+        {[...Array(35)].map((_, i) => (
+          <div key={i} className="aspect-square rounded-lg bg-border-primary/30 dark:bg-slate-800" />
+        ))}
+      </div>
+    </GlassCard>
+  );
+
+  const renderAISkeleton = () => (
+    <GlassCard hover={false} className="relative overflow-hidden bg-gradient-to-tr from-primary-600/5 via-pink-500/5 to-transparent border border-primary-500/20 p-6 space-y-4 animate-pulse">
+      <div className="flex items-center gap-2">
+        <div className="w-9 h-9 rounded-xl bg-border-primary/60 dark:bg-slate-800" />
+        <div className="space-y-1.5 w-1/2">
+          <div className="h-4 bg-border-primary/80 dark:bg-slate-700 rounded" />
+          <div className="h-2 bg-border-primary/40 dark:bg-slate-800 rounded w-3/4" />
+        </div>
+      </div>
+      <div className="space-y-2 pt-2">
+        <div className="h-3 bg-border-primary/50 dark:bg-slate-800 rounded" />
+        <div className="h-3 bg-border-primary/50 dark:bg-slate-800 rounded w-5/6" />
+        <div className="h-3 bg-border-primary/40 dark:bg-slate-800 rounded w-2/3" />
+      </div>
+    </GlassCard>
+  );
+
   return (
-    <div className="min-h-screen bg-mesh text-slate-800 dark:text-slate-100 transition-colors duration-300 font-sans">
-      <Sidebar />
-      
-      <div className="md:pl-64 min-h-screen transition-all duration-300">
-        <div className="pt-20 md:pt-8 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+    <AnimatedPage>
+      <div className="min-h-screen bg-mesh text-text-primary dark:text-slate-100 transition-colors duration-300 font-sans relative">
+        <Spotlight />
+        <Sidebar />
+        
+        <div className="md:pl-64 min-h-screen transition-all duration-300">
+          <div className="pt-20 md:pt-8 p-6 md:p-8 max-w-7xl mx-auto space-y-8">
           
           {/* Header Section */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -299,7 +438,7 @@ const Dashboard: React.FC = () => {
               <motion.h1 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="font-heading font-black text-3xl md:text-4xl tracking-tight text-slate-900 dark:text-white"
+                className="font-heading font-black text-3xl md:text-4xl tracking-tight text-text-primary"
               >
                 {getGreeting()}, Aditya!
               </motion.h1>
@@ -307,7 +446,7 @@ const Dashboard: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="text-slate-550 dark:text-slate-400 text-sm font-semibold"
+                className="text-text-secondary dark:text-text-muted text-sm font-semibold"
               >
                 {new Date(currentDateStr).toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' })}
               </motion.p>
@@ -316,9 +455,9 @@ const Dashboard: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 text-xs font-semibold text-slate-700 dark:text-slate-300 self-start"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-primary/60 dark:bg-surface-primary border border-border-primary text-xs font-semibold text-text-secondary self-start"
             >
-              <kbd className="px-2 py-0.5 border border-slate-200 dark:border-slate-850 bg-slate-100 dark:bg-slate-950 text-[10px] font-extrabold rounded text-slate-450 dark:text-slate-500">
+              <kbd className="px-2 py-0.5 border border-border-primary bg-bg-primary text-[10px] font-extrabold rounded text-text-muted">
                 Ctrl + K
               </kbd>
               <span>Quick Add Actions</span>
@@ -327,13 +466,13 @@ const Dashboard: React.FC = () => {
 
           {/* Premium Onboarding Card */}
           {showOnboarding && (
-            <GlassCard hover={false} className="border border-primary-500/20 bg-gradient-to-tr from-primary-600/5 to-transparent p-6 space-y-5">
+            <GlassCard hover={false} className="border border-brand-primary/20 bg-gradient-to-tr from-brand-primary/5 to-transparent p-6 space-y-5">
               <div>
-                <h3 className="font-heading font-black text-lg text-slate-850 dark:text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary-500" />
+                <h3 className="font-heading font-black text-lg text-text-primary flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-brand-primary" />
                   <span>Welcome to StudyAI Planner Pro!</span>
                 </h3>
-                <p className="text-xs text-slate-550 dark:text-slate-400 font-semibold mt-1">Let's set up your personalized scheduler in three quick steps:</p>
+                <p className="text-xs text-text-secondary dark:text-text-muted font-semibold mt-1">Let's set up your personalized scheduler in three quick steps:</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -342,17 +481,17 @@ const Dashboard: React.FC = () => {
                 <div className={`p-4 rounded-2xl border transition-all ${
                   hasSubjects 
                     ? 'bg-emerald-500/5 border-emerald-500/20 opacity-70' 
-                    : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-slate-800/50'
+                    : 'bg-surface-primary/40 dark:bg-surface-primary/40 border-border-primary/50'
                 }`}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
-                      hasSubjects ? 'bg-emerald-500 text-white' : 'bg-primary-500 text-white'
+                      hasSubjects ? 'bg-emerald-500 text-white' : 'bg-brand-primary text-white'
                     }`}>
                       {hasSubjects ? '✓' : '1'}
                     </span>
-                    <h4 className="font-bold text-xs text-slate-800 dark:text-white">Add Academic Subjects</h4>
+                    <h4 className="font-bold text-xs text-text-primary">Add Academic Subjects</h4>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-semibold mb-3">Configure subjects you are enrolled in.</p>
+                  <p className="text-[10px] text-text-secondary font-semibold mb-3">Configure subjects you are enrolled in.</p>
                   
                   {!hasSubjects ? (
                     <form onSubmit={handleAddSubjectOnboarding} className="flex gap-1.5">
@@ -362,9 +501,9 @@ const Dashboard: React.FC = () => {
                         placeholder="e.g. Calculus"
                         value={obSubject}
                         onChange={(e) => setObSubject(e.target.value)}
-                        className="flex-1 text-[10px] px-2 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-250 dark:border-slate-800 text-slate-800 dark:text-white"
+                        className="flex-1 text-[10px] px-2 py-1.5 rounded-lg bg-surface-primary dark:bg-bg-primary border border-border-primary text-text-primary"
                       />
-                      <button type="submit" className="px-2 py-1.5 bg-primary-600 text-white rounded-lg text-[10px] font-extrabold cursor-pointer">
+                      <button type="submit" className="px-2 py-1.5 bg-brand-primary text-white rounded-lg text-[10px] font-extrabold cursor-pointer">
                         Add
                       </button>
                     </form>
@@ -377,22 +516,22 @@ const Dashboard: React.FC = () => {
                 <div className={`p-4 rounded-2xl border transition-all ${
                   hasExams 
                     ? 'bg-emerald-500/5 border-emerald-500/20 opacity-70' 
-                    : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-slate-800/50'
+                    : 'bg-surface-primary/40 dark:bg-surface-primary/40 border-border-primary/50'
                 }`}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
-                      hasExams ? 'bg-emerald-500 text-white' : 'bg-primary-500 text-white'
+                      hasExams ? 'bg-emerald-500 text-white' : 'bg-brand-primary text-white'
                     }`}>
                       {hasExams ? '✓' : '2'}
                     </span>
-                    <h4 className="font-bold text-xs text-slate-800 dark:text-white">Add Exams Countdown</h4>
+                    <h4 className="font-bold text-xs text-text-primary">Add Exams Countdown</h4>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-semibold mb-3">Log milestone exam dates for calculation.</p>
+                  <p className="text-[10px] text-text-secondary font-semibold mb-3">Log milestone exam dates for calculation.</p>
                   
                   {!hasExams ? (
                     <button
                       onClick={() => setShowExamForm(true)}
-                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-350 rounded-lg text-[10px] font-bold cursor-pointer"
+                      className="px-3 py-1.5 bg-bg-primary text-text-secondary rounded-lg text-[10px] font-bold cursor-pointer"
                     >
                       Configure Exam
                     </button>
@@ -405,22 +544,22 @@ const Dashboard: React.FC = () => {
                 <div className={`p-4 rounded-2xl border transition-all ${
                   hasPlan 
                     ? 'bg-emerald-500/5 border-emerald-500/20 opacity-70' 
-                    : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-slate-800/50'
+                    : 'bg-surface-primary/40 dark:bg-surface-primary/40 border-border-primary/50'
                 }`}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
-                      hasPlan ? 'bg-emerald-500 text-white' : 'bg-primary-500 text-white'
+                      hasPlan ? 'bg-emerald-500 text-white' : 'bg-brand-primary text-white'
                     }`}>
                       {hasPlan ? '✓' : '3'}
                     </span>
-                    <h4 className="font-bold text-xs text-slate-800 dark:text-white">Generate AI Study Plan</h4>
+                    <h4 className="font-bold text-xs text-text-primary">Generate AI Study Plan</h4>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-semibold mb-3">Run optimization models to structure sessions.</p>
+                  <p className="text-[10px] text-text-secondary font-semibold mb-3">Run optimization models to structure sessions.</p>
                   
                   {!hasPlan ? (
                     <Link
                       to="/planner"
-                      className="inline-block px-3 py-1.5 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-[10px] font-extrabold cursor-pointer"
+                      className="inline-block px-3 py-1.5 bg-brand-primary text-white rounded-lg text-[10px] font-extrabold cursor-pointer"
                     >
                       AI Planner
                     </Link>
@@ -433,90 +572,104 @@ const Dashboard: React.FC = () => {
             </GlassCard>
           )}
 
-          {/* Metric Cards (Top Grid) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Card 1: Today's Tasks */}
-            <GlassCard hover={true} className="flex items-center justify-between p-5">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest">Today's Tasks</span>
-                <h3 className="font-heading font-black text-2xl text-slate-850 dark:text-white leading-tight">
-                  {todayCompletedTasksCount} / {todayTotalTasksCount}
-                </h3>
-                <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-450">
-                  {todayTotalTasksCount > 0 
-                    ? `${Math.round((todayCompletedTasksCount / todayTotalTasksCount) * 100)}% complete`
-                    : 'No tasks scheduled'
-                  }
-                </p>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-primary-500/10 text-primary-500">
-                <CheckSquare className="w-5.5 h-5.5" />
-              </div>
-            </GlassCard>
+          {/* Metric Cards (Top Grid with Skeletons support) */}
+          {isLoading ? renderMetricSkeletons() : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              
+              {/* Card 1: Today's Tasks */}
+              <GlassCard hover={true} className="flex items-center justify-between p-5">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase tracking-widest">Today's Tasks</span>
+                  <h3 className="font-heading font-black text-2xl text-text-primary leading-tight">
+                    {typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test' ? (
+                      `${todayCompletedTasksCount} / ${todayTotalTasksCount}`
+                    ) : (
+                      <><CountUp target={todayCompletedTasksCount} /> / <CountUp target={todayTotalTasksCount} /></>
+                    )}
+                  </h3>
+                  <p className="text-[10px] font-semibold text-text-muted">
+                    {todayTotalTasksCount > 0 
+                      ? `${Math.round((todayCompletedTasksCount / todayTotalTasksCount) * 100)}% complete`
+                      : 'No tasks scheduled'
+                    }
+                  </p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-brand-primary/10 text-brand-primary">
+                  <CheckSquare className="w-5.5 h-5.5" />
+                </div>
+              </GlassCard>
 
-            {/* Card 2: Study Time Today */}
-            <GlassCard hover={true} className="flex items-center justify-between p-5">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest">Study Time Today</span>
-                <h3 className="font-heading font-black text-2xl text-slate-850 dark:text-white leading-tight">
-                  {todayStudyHoursStr} h
-                </h3>
-                <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-450">Active focus time today</p>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-cyan-500/10 text-cyan-505">
-                <Clock className="w-5.5 h-5.5" />
-              </div>
-            </GlassCard>
+              {/* Card 2: Study Time Today */}
+              <GlassCard hover={true} className="flex items-center justify-between p-5">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase tracking-widest">Study Time Today</span>
+                  <h3 className="font-heading font-black text-2xl text-text-primary leading-tight">
+                    {typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test' ? (
+                      `${todayStudyHoursStr} h`
+                    ) : (
+                      <CountUp target={parseFloat(todayStudyHoursStr)} decimals={1} suffix=" h" />
+                    )}
+                  </h3>
+                  <p className="text-[10px] font-semibold text-text-muted">Active focus time today</p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-cyan-500/10 text-cyan-500">
+                  <Clock className="w-5.5 h-5.5" />
+                </div>
+              </GlassCard>
 
-            {/* Card 3: Current Streak */}
-            <GlassCard hover={true} className="flex items-center justify-between p-5">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest">Current Streak</span>
-                <h3 className="font-heading font-black text-2xl text-slate-850 dark:text-white leading-tight">
-                  {streakCount} Day{streakCount !== 1 ? 's' : ''}
-                </h3>
-                <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-450">
-                  {streakCount > 0 ? 'Keep it active! 🔥' : 'Log a session to start'}
-                </p>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-orange-500/10 text-orange-500">
-                <Flame className="w-5.5 h-5.5" />
-              </div>
-            </GlassCard>
+              {/* Card 3: Current Streak */}
+              <GlassCard hover={true} className="flex items-center justify-between p-5">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase tracking-widest">Current Streak</span>
+                  <h3 className="font-heading font-black text-2xl text-text-primary leading-tight">
+                    {typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test' ? (
+                      `${streakCount} Day${streakCount !== 1 ? 's' : ''}`
+                    ) : (
+                      <><CountUp target={streakCount} /> Day{streakCount !== 1 ? 's' : ''}</>
+                    )}
+                  </h3>
+                  <p className="text-[10px] font-semibold text-text-muted">
+                    {streakCount > 0 ? 'Keep it active! 🔥' : 'Log a session to start'}
+                  </p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-orange-500/10 text-orange-500">
+                  <Flame className="w-5.5 h-5.5" />
+                </div>
+              </GlassCard>
 
-            {/* Card 4: Next Exam */}
-            <GlassCard hover={true} className="flex items-center justify-between p-5">
-              <div className="space-y-1 overflow-hidden">
-                <span className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest">Next Exam</span>
-                <h3 className="font-heading font-black text-lg text-slate-850 dark:text-white leading-tight truncate">
-                  {nextExam ? nextExam.subject : 'None'}
-                </h3>
-                <p className="text-[10px] font-semibold text-slate-450 dark:text-slate-450 truncate">
-                  {nextExam ? `${nextExam.name} (${getDaysRemaining(nextExam.date)}d)` : 'Ready to customize'}
-                </p>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-rose-500/10 text-rose-500">
-                <CalendarIcon className="w-5.5 h-5.5" />
-              </div>
-            </GlassCard>
+              {/* Card 4: Next Exam */}
+              <GlassCard hover={true} className="flex items-center justify-between p-5">
+                <div className="space-y-1 overflow-hidden">
+                  <span className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase tracking-widest">Next Exam</span>
+                  <h3 className="font-heading font-black text-lg text-text-primary leading-tight truncate">
+                    {nextExam ? nextExam.subject : 'None'}
+                  </h3>
+                  <p className="text-[10px] font-semibold text-text-muted truncate">
+                    {nextExam ? `${nextExam.name} (${getDaysRemaining(nextExam.date)}d)` : 'Ready to customize'}
+                  </p>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-rose-500/10 text-rose-500">
+                  <CalendarIcon className="w-5.5 h-5.5" />
+                </div>
+              </GlassCard>
 
-          </div>
+            </div>
+          )}
 
           {/* Weekly Progress Bar Block (Separate panel below metrics) */}
           <GlassCard hover={false} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-450 dark:text-slate-500">Weekly Progress</span>
-              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              <span className="text-[10px] font-black uppercase tracking-widest text-text-muted dark:text-text-secondary">Weekly Progress</span>
+              <p className="text-xs font-bold text-text-primary">
                 Your cumulative task and session accomplishment rate over the last 7 days.
               </p>
             </div>
             
             <div className="flex items-center gap-4 flex-1 max-w-md w-full sm:justify-end">
-              <span className="font-heading font-black text-2xl text-slate-900 dark:text-white shrink-0">
-                {overallProgress}%
+              <span className="font-heading font-black text-2xl text-text-primary shrink-0">
+                <CountUp target={overallProgress} />%
               </span>
-              <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-850/60">
+              <div className="w-full bg-bg-primary h-2 rounded-full overflow-hidden border border-border-primary/50">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${overallProgress}%` }}
@@ -534,177 +687,245 @@ const Dashboard: React.FC = () => {
             <div className="lg:col-span-2 space-y-8">
               
               {/* Today's Agenda (scheduled tasks + study sessions) */}
-              <GlassCard hover={false} className="p-6 space-y-5">
-                <div className="border-b border-slate-200/40 dark:border-slate-850/40 pb-3 flex items-center justify-between">
-                  <h2 className="font-heading font-black text-xl text-slate-900 dark:text-white flex items-center gap-2">
-                    <Bookmark className="w-5.5 h-5.5 text-primary-500" />
-                    <span>Today's Agenda</span>
-                  </h2>
-                  <span className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase">Current Day view</span>
-                </div>
+              {isLoading ? renderListSkeleton() : (
+                <GlassCard hover={false} className="p-6 space-y-5">
+                  <div className="border-b border-border-primary/40 pb-3 flex items-center justify-between">
+                    <h2 className="font-heading font-black text-xl text-text-primary flex items-center gap-2">
+                      <Bookmark className="w-5.5 h-5.5 text-brand-primary" />
+                      <span>Today's Agenda</span>
+                    </h2>
+                    <span className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase">Current Day view</span>
+                  </div>
 
-                <div className="space-y-3">
-                  {todayAllTasks.length === 0 && todayLoggedSessions.length === 0 ? (
-                    <div className="text-center py-6 text-slate-450 dark:text-slate-500 font-semibold">
-                      Your schedule is clear today. Generate an AI study plan or add a custom task.
-                    </div>
-                  ) : (
-                    <>
-                      {/* Tasks Agenda List */}
-                      {todayAllTasks.map(task => (
-                        <div key={task.id} className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-850/40 bg-white/20 dark:bg-slate-900/20">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => {
-                                if (!task.isGenerated) {
-                                  toggleTaskComplete(task.id);
-                                } else {
-                                  togglePlanTaskComplete(currentDateStr, task.id);
-                                }
-                              }}
-                              aria-label={`Toggle completion of ${task.title}`}
-                              className={`w-5.5 h-5.5 rounded border flex items-center justify-center cursor-pointer transition-colors ${
-                                task.completed ? 'bg-primary-500 border-primary-500 text-white' : 'border-slate-350 dark:border-slate-650'
-                              }`}
-                            >
-                              {task.completed && <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />}
-                            </button>
-                            <div>
-                              <p className={`text-xs font-bold ${task.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}`}>
-                                {task.title}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-550 dark:text-slate-400">
-                                  {task.subject}
-                                </span>
-                                {'isGenerated' in task && task.isGenerated && (
-                                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-primary-500/10 rounded text-primary-600 dark:text-primary-400 flex items-center gap-0.5">
-                                    <Sparkles className="w-2.5 h-2.5" />
-                                    <span>AI Revision</span>
-                                  </span>
+                  <div className="space-y-3">
+                    {todayAllTasks.length === 0 && todayLoggedSessions.length === 0 ? (
+                      <div className="text-center py-10 px-4 text-text-secondary border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10">
+                        <CheckCircle2 className="w-8 h-8 text-brand-primary mx-auto mb-3 opacity-60" />
+                        <h4 className="font-heading font-black text-sm text-text-primary">All Tasks Completed!</h4>
+                        <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">Your agenda is fully clear. Generate an AI study plan or add a custom task.</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Tasks Agenda List */}
+                        {todayAllTasks.map(task => (
+                          <div key={task.id} className="flex items-center justify-between p-3.5 rounded-xl border border-border-primary/50 bg-surface-primary/20">
+                            <div className="flex items-center gap-3">
+                              <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => handleToggleTask(task)}
+                                aria-label={`Toggle completion of ${task.title}`}
+                                className={`w-5.5 h-5.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all relative ${
+                                  task.completed 
+                                    ? 'bg-brand-primary border-brand-primary text-white shadow-md shadow-brand-primary/20' 
+                                    : 'border-border-primary hover:border-brand-primary bg-bg-primary'
+                                }`}
+                              >
+                                {task.completed && (
+                                  <motion.div
+                                    initial={{ scale: 0, rotate: -20 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                  >
+                                    <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />
+                                  </motion.div>
                                 )}
+                                
+                                {/* Confetti burst celebration */}
+                                {confettiActiveTaskId === task.id && (
+                                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50">
+                                    {[...Array(8)].map((_, i) => {
+                                      const angle = (i * 360) / 8;
+                                      const radians = (angle * Math.PI) / 180;
+                                      const x = Math.cos(radians) * 35;
+                                      const y = Math.sin(radians) * 35;
+                                      const colors = ['#6D4AFF', '#EC4899', '#10B981', '#F59E0B', '#3B82F6'];
+                                      const color = colors[i % colors.length];
+
+                                      return (
+                                        <motion.div
+                                          key={i}
+                                          initial={{ scale: 0.8, opacity: 1, x: 0, y: 0 }}
+                                          animate={{ scale: 0, opacity: 0, x, y }}
+                                          transition={{ duration: 0.6, ease: "easeOut" }}
+                                          className="w-1.5 h-1.5 rounded-full absolute"
+                                          style={{ backgroundColor: color }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </motion.button>
+                              <div>
+                                <p className={`text-xs font-bold ${task.completed ? 'line-through text-text-muted' : 'text-text-primary'}`}>
+                                  {task.title}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-bg-primary rounded text-text-secondary">
+                                    {task.subject}
+                                  </span>
+                                  {'isGenerated' in task && task.isGenerated && (
+                                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-brand-primary/10 rounded text-brand-primary flex items-center gap-0.5">
+                                      <Sparkles className="w-2.5 h-2.5" />
+                                      <span>AI Revision</span>
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
+                            <span className="text-[10px] font-semibold text-text-muted flex items-center gap-0.5">
+                              <Clock className="w-3.5 h-3.5" /> {task.estimatedHours}h
+                            </span>
                           </div>
-                          <span className="text-[10px] font-semibold text-slate-450 flex items-center gap-0.5">
-                            <Clock className="w-3.5 h-3.5" /> {task.estimatedHours}h
-                          </span>
-                        </div>
-                      ))}
+                        ))}
 
-                      {/* Logged study sessions lists */}
-                      {todayLoggedSessions.map(session => (
-                        <div key={session.id} className="flex items-center justify-between p-3.5 rounded-xl border border-cyan-500/10 bg-cyan-500/5">
-                          <div className="flex items-center gap-3">
-                            <div className="w-5.5 h-5.5 rounded bg-cyan-500/10 text-cyan-500 flex items-center justify-center shrink-0">
-                              <Clock className="w-3.5 h-3.5" />
-                            </div>
-                            <div>
-                              <p className="text-xs font-black text-slate-800 dark:text-slate-200">
-                                Logged {session.subject} Study Session
-                              </p>
-                              <p className="text-[9px] font-semibold text-slate-450">
-                                {new Date(session.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </p>
-                            </div>
-                          </div>
-                          <span className="text-xs font-black text-cyan-600 dark:text-cyan-400">
-                            {(session.durationMinutes / 60).toFixed(1)} h
-                          </span>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
-              </GlassCard>
-
-              {/* Focus Tasks (Sorted by priority) */}
-              <GlassCard hover={false} className="p-6 space-y-5">
-                <div className="border-b border-slate-200/40 dark:border-slate-850/40 pb-3 flex items-center justify-between">
-                  <h2 className="font-heading font-black text-xl text-slate-900 dark:text-white flex items-center gap-2">
-                    <CheckCircle2 className="w-5.5 h-5.5 text-primary-500" />
-                    <span>Focus Tasks for Today</span>
-                  </h2>
-                  <Link to="/tasks" className="text-xs font-bold text-primary-655 hover:underline flex items-center gap-0.5">
-                    <span>View All Tasks</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-
-                <div className="space-y-3">
-                  {todayAllTasks.length === 0 ? (
-                    <div className="text-center py-6 text-slate-450 dark:text-slate-500 font-semibold">
-                      Your schedule is clear today. Generate an AI study plan or add a custom task.
-                    </div>
-                  ) : (
-                    // Sort high, then medium, then low
-                    [...todayAllTasks]
-                      .sort((a, b) => {
-                        const prioWeight = { High: 3, Medium: 2, Low: 1 };
-                        return prioWeight[b.priority] - prioWeight[a.priority];
-                      })
-                      .map(task => (
-                        <div key={task.id} className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/40 dark:border-slate-850/40 bg-white/10 dark:bg-slate-950/20">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => {
-                                if (!task.isGenerated) {
-                                  toggleTaskComplete(task.id);
-                                } else {
-                                  togglePlanTaskComplete(currentDateStr, task.id);
-                                }
-                              }}
-                              aria-label={`Toggle completion of ${task.title}`}
-                              className={`w-5.5 h-5.5 rounded border flex items-center justify-center cursor-pointer transition-colors ${
-                                task.completed ? 'bg-primary-500 border-primary-500 text-white' : 'border-slate-350 dark:border-slate-650'
-                              }`}
-                            >
-                              {task.completed && <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />}
-                            </button>
-                            <div>
-                              <p className={`text-xs font-semibold ${task.completed ? 'line-through text-slate-450' : 'text-slate-800 dark:text-slate-200'}`}>
-                                {task.title}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-slate-250/50 dark:bg-slate-800 rounded text-slate-500">
-                                  {task.subject}
-                                </span>
-                                <span className={`text-[9px] font-black uppercase ${
-                                  task.priority === 'High' ? 'text-rose-500' : task.priority === 'Medium' ? 'text-amber-500' : 'text-blue-500'
-                                }`}>
-                                  {task.priority}
-                                </span>
+                        {/* Logged study sessions lists */}
+                        {todayLoggedSessions.map(session => (
+                          <div key={session.id} className="flex items-center justify-between p-3.5 rounded-xl border border-cyan-500/10 bg-cyan-500/5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-5.5 h-5.5 rounded bg-cyan-500/10 text-cyan-500 flex items-center justify-center shrink-0">
+                                <Clock className="w-3.5 h-3.5" />
+                              </div>
+                              <div>
+                                <p className="text-xs font-black text-text-primary">
+                                  Logged {session.subject} Study Session
+                                </p>
+                                <p className="text-[9px] font-semibold text-text-muted">
+                                  {new Date(session.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
                               </div>
                             </div>
+                            <span className="text-xs font-black text-cyan-600 dark:text-cyan-400">
+                              {(session.durationMinutes / 60).toFixed(1)} h
+                            </span>
                           </div>
-                          
-                          <span className="text-[10px] font-bold text-slate-450 flex items-center gap-0.5">
-                            <Clock className="w-3.5 h-3.5" /> {task.estimatedHours}h
-                          </span>
-                        </div>
-                      ))
-                  )}
-                </div>
-              </GlassCard>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* Focus Tasks (Sorted by priority with skeleton loaders support) */}
+              {isLoading ? renderListSkeleton() : (
+                <GlassCard hover={false} className="p-6 space-y-5">
+                  <div className="border-b border-border-primary/40 pb-3 flex items-center justify-between">
+                    <h2 className="font-heading font-black text-xl text-text-primary flex items-center gap-2">
+                      <CheckCircle2 className="w-5.5 h-5.5 text-brand-primary" />
+                      <span>Focus Tasks for Today</span>
+                    </h2>
+                    <Link to="/tasks" className="text-xs font-bold text-brand-primary hover:underline flex items-center gap-0.5">
+                      <span>View All Tasks</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+
+                  <div className="space-y-3">
+                    {todayAllTasks.length === 0 ? (
+                      <div className="text-center py-10 px-4 text-text-secondary border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10">
+                        <CheckSquare className="w-8 h-8 text-brand-primary mx-auto mb-3 opacity-60" />
+                        <h4 className="font-heading font-black text-sm text-text-primary">Clear Schedule</h4>
+                        <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">All study task countdowns have been processed successfully.</p>
+                      </div>
+                    ) : (
+                      // Sort high, then medium, then low
+                      [...todayAllTasks]
+                        .sort((a, b) => {
+                          const prioWeight = { High: 3, Medium: 2, Low: 1 };
+                          return prioWeight[b.priority] - prioWeight[a.priority];
+                        })
+                        .map(task => (
+                          <div key={task.id} className="flex items-center justify-between p-3.5 rounded-xl border border-border-primary/40 bg-surface-primary/10">
+                            <div className="flex items-center gap-3">
+                              <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => handleToggleTask(task)}
+                                aria-label={`Toggle completion of ${task.title}`}
+                                className={`w-5.5 h-5.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all relative ${
+                                  task.completed 
+                                    ? 'bg-brand-primary border-brand-primary text-white shadow-md shadow-brand-primary/20' 
+                                    : 'border-border-primary hover:border-brand-primary bg-bg-primary'
+                                }`}
+                              >
+                                {task.completed && (
+                                  <motion.div
+                                    initial={{ scale: 0, rotate: -20 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                  >
+                                    <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />
+                                  </motion.div>
+                                )}
+                                
+                                {/* Confetti burst celebration */}
+                                {confettiActiveTaskId === task.id && (
+                                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50">
+                                    {[...Array(8)].map((_, i) => {
+                                      const angle = (i * 360) / 8;
+                                      const radians = (angle * Math.PI) / 180;
+                                      const x = Math.cos(radians) * 35;
+                                      const y = Math.sin(radians) * 35;
+                                      const colors = ['#6D4AFF', '#EC4899', '#10B981', '#F59E0B', '#3B82F6'];
+                                      const color = colors[i % colors.length];
+
+                                      return (
+                                        <motion.div
+                                          key={i}
+                                          initial={{ scale: 0.8, opacity: 1, x: 0, y: 0 }}
+                                          animate={{ scale: 0, opacity: 0, x, y }}
+                                          transition={{ duration: 0.6, ease: "easeOut" }}
+                                          className="w-1.5 h-1.5 rounded-full absolute"
+                                          style={{ backgroundColor: color }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </motion.button>
+                              <div>
+                                <p className={`text-xs font-semibold ${task.completed ? 'line-through text-text-muted' : 'text-text-primary'}`}>
+                                  {task.title}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 bg-border-primary/50 rounded text-text-secondary">
+                                    {task.subject}
+                                  </span>
+                                  <span className={`text-[9px] font-black uppercase ${
+                                    task.priority === 'High' ? 'text-rose-500' : task.priority === 'Medium' ? 'text-amber-500' : 'text-blue-500'
+                                  }`}>
+                                    {task.priority}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <span className="text-[10px] font-bold text-text-muted flex items-center gap-0.5">
+                              <Clock className="w-3.5 h-3.5" /> {task.estimatedHours}h
+                            </span>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </GlassCard>
+              )}
 
               {/* Study Insights Chart (7D, 30D, 90D tabs) */}
               <GlassCard hover={false} className="p-6 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-4 gap-4">
-                  <h3 className="font-heading font-black text-lg text-slate-900 dark:text-white flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary-500" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border-primary/40 pb-4 gap-4">
+                  <h3 className="font-heading font-black text-lg text-text-primary flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-brand-primary" />
                     <span>Study Insights</span>
                   </h3>
                   
                   {/* Tabs */}
-                  <div className="flex rounded-lg bg-slate-100 dark:bg-slate-950 p-1 self-start">
+                  <div className="flex rounded-lg bg-bg-primary p-1 self-start">
                     {(['7D', '30D', '90D'] as const).map(tab => (
                       <button
                         key={tab}
                         onClick={() => setChartTab(tab)}
                         className={`px-3 py-1 rounded-md text-[10px] font-extrabold transition-colors cursor-pointer ${
                           chartTab === tab 
-                            ? 'bg-white dark:bg-slate-900 text-primary-655 dark:text-primary-350 shadow'
-                            : 'text-slate-500 hover:text-slate-700'
+                            ? 'bg-surface-primary text-brand-primary shadow'
+                            : 'text-text-secondary hover:text-text-secondary'
                         }`}
                       >
                         {tab}
@@ -716,13 +937,14 @@ const Dashboard: React.FC = () => {
                 {/* Plot area */}
                 <div className="space-y-4">
                   {studySessions.length === 0 ? (
-                    <div className="h-56 flex flex-col items-center justify-center text-slate-450 dark:text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                      <Clock className="w-8 h-8 text-slate-300 mb-2" />
-                      <p className="text-xs font-semibold">Log a study session to populate your insights chart!</p>
+                    <div className="h-56 flex flex-col items-center justify-center text-text-secondary dark:text-text-muted border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10 px-4 text-center">
+                      <Clock className="w-8 h-8 text-brand-primary mb-3 opacity-60" />
+                      <h4 className="font-heading font-black text-sm text-text-primary font-bold">No Study Data Yet</h4>
+                      <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">Track dynamic focus sessions to populate interactive chart metrics.</p>
                     </div>
                   ) : (
                     <div 
-                      className="h-56 flex items-end justify-between px-2 pt-6 relative border-b border-slate-200/40 dark:border-slate-850/40"
+                      className="h-56 flex items-end justify-between px-2 pt-6 relative border-b border-border-primary/40"
                       role="img"
                       aria-label="Insights chart showing study hours aggregations"
                     >
@@ -731,17 +953,17 @@ const Dashboard: React.FC = () => {
                         return (
                           <div key={idx} className="flex flex-col items-center gap-2 flex-1 group">
                             <div className="w-7 sm:w-9 relative flex justify-center items-end h-40">
-                              <span className="absolute -top-7 scale-0 group-hover:scale-100 bg-slate-900 dark:bg-slate-850 border border-slate-700 text-white dark:text-slate-100 text-[10px] px-2 py-1 rounded font-bold transition-all z-20 pointer-events-none">
+                              <span className="absolute -top-7 scale-0 group-hover:scale-100 bg-slate-900 dark:bg-bg-primary border border-border-primary text-white text-[10px] px-2 py-1 rounded font-bold transition-all z-20 pointer-events-none">
                                 {item.hours}h
                               </span>
                               <motion.div
                                 initial={{ height: 0 }}
                                 animate={{ height: `${pctHeight}%` }}
                                 transition={{ duration: 0.6, delay: idx * 0.05 }}
-                                className="w-full rounded-t-lg bg-gradient-to-t from-primary-600/70 to-primary-500 group-hover:from-primary-500 group-hover:to-pink-500 transition-colors shadow-lg shadow-primary-500/5" 
+                                className="w-full rounded-t-lg bg-gradient-to-t from-primary-600/70 to-primary-500 group-hover:from-primary-500 group-hover:to-pink-500 transition-colors shadow-lg" 
                               />
                             </div>
-                            <span className="text-[10px] font-bold text-slate-450 dark:text-slate-500">{item.label}</span>
+                            <span className="text-[10px] font-bold text-text-muted dark:text-text-secondary">{item.label}</span>
                           </div>
                         );
                       })}
@@ -756,208 +978,217 @@ const Dashboard: React.FC = () => {
             <div className="space-y-8">
               
               {/* AI Study Assistant Card */}
-              <GlassCard 
-                hover={true} 
-                className="relative overflow-hidden bg-gradient-to-tr from-primary-600/10 via-pink-500/5 to-transparent border border-primary-500/20 p-6 space-y-4"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl pointer-events-none" />
-                
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-lg shadow-primary-500/10">
-                    <Sparkles className="w-5 h-5 animate-pulse" />
+              {isLoading ? renderAISkeleton() : (
+                <GlassCard 
+                  hover={true} 
+                  className="relative overflow-hidden bg-gradient-to-tr from-brand-primary/10 via-pink-500/5 to-transparent border border-brand-primary/20 p-6 space-y-4"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-full blur-2xl pointer-events-none" />
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-lg">
+                      <Sparkles className="w-5 h-5 animate-pulse" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-extrabold text-lg text-text-primary">AI assistant</h3>
+                      <p className="text-[10px] uppercase font-bold text-brand-primary">Study Strategy Recommendation</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-heading font-extrabold text-lg text-slate-850 dark:text-white">AI assistant</h3>
-                    <p className="text-[10px] uppercase font-bold text-primary-500">Study Strategy Recommendation</p>
+
+                  <p className="text-xs font-semibold text-text-secondary leading-relaxed">
+                    "{aiAssistantText}"
+                  </p>
+
+                  <div className="pt-2 flex items-center gap-4">
+                    <Link
+                      to="/planner"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-xs shadow-lg hover:-translate-y-0.5 transition-all"
+                    >
+                      <span>Launch AI Planner</span>
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </Link>
+                    <Link
+                      to="/assistant"
+                      className="text-xs font-bold text-text-secondary hover:text-brand-primary transition-colors flex items-center"
+                    >
+                      AI Chat
+                    </Link>
                   </div>
-                </div>
-
-                <p className="text-xs font-semibold text-slate-655 dark:text-slate-350 leading-relaxed">
-                  "{aiAssistantText}"
-                </p>
-
-                <div className="pt-2 flex items-center gap-4">
-                  <Link
-                    to="/planner"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-xs shadow-lg shadow-primary-500/20 hover:-translate-y-0.5 transition-all"
-                  >
-                    <span>Launch AI Planner</span>
-                    <Sparkles className="w-3.5 h-3.5" />
-                  </Link>
-                  <Link
-                    to="/assistant"
-                    className="text-xs font-bold text-slate-500 hover:text-primary-500 transition-colors flex items-center"
-                  >
-                    AI Chat
-                  </Link>
-                </div>
-              </GlassCard>
+                </GlassCard>
+              )}
 
               {/* Interactive Mini Calendar */}
-              <GlassCard hover={false} className="p-5 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-3">
-                  <h3 className="font-heading font-black text-sm text-slate-850 dark:text-white flex items-center gap-1.5">
-                    <CalendarIcon className="w-4.5 h-4.5 text-primary-500" />
-                    <span>Study Calendar</span>
-                  </h3>
-                  <div className="flex gap-1">
-                    <button onClick={handlePrevMonth} className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 cursor-pointer">
-                      <ChevronLeft className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={handleNextMonth} className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-500 cursor-pointer">
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="text-center text-xs font-bold text-slate-800 dark:text-white mb-2">
-                  {calendarMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                </div>
-
-                {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1 text-center">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
-                    <span key={idx} className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{day}</span>
-                  ))}
-                  
-                  {calendarDays.map((day, idx) => {
-                    if (day === null) return <div key={`blank-${idx}`} className="aspect-square" />;
-                    const dateKey = formatCalendarDate(day);
-                    const indicators = getCalendarDayIndicators(dateKey);
-                    const isSelected = selectedCalendarDateStr === dateKey;
-                    const isToday = currentDateStr === dateKey;
-
-                    return (
-                      <button
-                        key={day}
-                        onClick={() => setSelectedCalendarDateStr(dateKey)}
-                        className={`aspect-square rounded-lg flex flex-col items-center justify-center p-0.5 relative cursor-pointer text-[10px] font-bold border transition-colors ${
-                          isSelected 
-                            ? 'bg-primary-500 border-primary-500 text-white shadow' 
-                            : isToday
-                              ? 'bg-primary-100/50 dark:bg-primary-950/20 border-primary-500/30 text-slate-800 dark:text-white font-extrabold'
-                              : 'bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
-                        }`}
-                      >
-                        <span>{day}</span>
-                        {/* Dot indicator */}
-                        <div className="absolute bottom-0.5 flex gap-0.5">
-                          {indicators.hasExam && <span className="w-1 h-1 rounded-full bg-rose-500" />}
-                          {indicators.hasSession && <span className="w-1 h-1 rounded-full bg-cyan-500" />}
-                          {indicators.hasRevision && <span className="w-1 h-1 rounded-full bg-purple-500" />}
-                        </div>
+              {isLoading ? renderCalendarSkeleton() : (
+                <GlassCard hover={false} className="p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-border-primary/40 pb-3">
+                    <h3 className="font-heading font-black text-sm text-text-primary flex items-center gap-1.5">
+                      <CalendarIcon className="w-4.5 h-4.5 text-brand-primary" />
+                      <span>Study Calendar</span>
+                    </h3>
+                    <div className="flex gap-1">
+                      <button onClick={handlePrevMonth} className="p-1 rounded bg-bg-primary text-text-secondary cursor-pointer">
+                        <ChevronLeft className="w-3.5 h-3.5" />
                       </button>
-                    );
-                  })}
-                </div>
+                      <button onClick={handleNextMonth} className="p-1 rounded bg-bg-primary text-text-secondary cursor-pointer">
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
 
-                {/* Selected Day Agenda details sub-pane */}
-                <div className="border-t border-slate-200/40 dark:border-slate-850/40 pt-3 mt-3">
-                  <span className="text-[9px] font-bold text-slate-450 uppercase tracking-wider block mb-2">
-                    Agenda: {new Date(selectedCalendarDateStr).toLocaleDateString('default', { month: 'short', day: 'numeric' })}
-                  </span>
+                  <div className="text-center text-xs font-bold text-text-primary mb-2">
+                    {calendarMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                  </div>
 
-                  <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                    {selectedCalendarExams.map(exam => (
-                      <div key={exam.id} className="p-2 rounded bg-rose-500/5 border border-rose-500/10 text-rose-800 dark:text-rose-200 text-[10px] font-bold">
-                        Exam: {exam.name}
-                      </div>
+                  {/* Calendar Grid */}
+                  <div className="grid grid-cols-7 gap-1 text-center">
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                      <span key={idx} className="text-[8px] font-bold text-text-muted uppercase tracking-widest">{day}</span>
                     ))}
                     
-                    {selectedCalendarCustomTasks.map(task => (
-                      <div key={task.id} className="p-2 rounded border border-slate-200/50 dark:border-slate-805/60 text-[10px] font-semibold text-slate-700 dark:text-slate-350 flex justify-between">
-                        <span className={task.completed ? 'line-through text-slate-400' : ''}>{task.title}</span>
-                        <span className="text-[9px] uppercase font-bold text-slate-450">{task.subject}</span>
-                      </div>
-                    ))}
+                    {calendarDays.map((day, idx) => {
+                      if (day === null) return <div key={`blank-${idx}`} className="aspect-square" />;
+                      const dateKey = formatCalendarDate(day);
+                      const indicators = getCalendarDayIndicators(dateKey);
+                      const isSelected = selectedCalendarDateStr === dateKey;
+                      const isToday = currentDateStr === dateKey;
 
-                    {selectedCalendarRevisionTasks.map(task => (
-                      <div key={task.id} className="p-2 rounded bg-primary-500/5 border border-primary-500/10 text-[10px] font-semibold text-slate-700 dark:text-slate-350 flex justify-between">
-                        <span className={task.completed ? 'line-through text-slate-400' : ''}>{task.title}</span>
-                        <span className="text-[8px] uppercase font-bold text-primary-500">Revision</span>
-                      </div>
-                    ))}
-
-                    {selectedCalendarSessions.map(session => (
-                      <div key={session.id} className="p-2 rounded bg-cyan-500/5 border border-cyan-500/10 text-[10px] font-bold text-cyan-600 dark:text-cyan-400 flex justify-between">
-                        <span>Study Session</span>
-                        <span>{(session.durationMinutes / 60).toFixed(1)}h</span>
-                      </div>
-                    ))}
-
-                    {selectedCalendarExams.length === 0 && 
-                     selectedCalendarCustomTasks.length === 0 && 
-                     selectedCalendarRevisionTasks.length === 0 && 
-                     selectedCalendarSessions.length === 0 && (
-                      <span className="text-[10px] font-semibold text-slate-450">Clear schedule</span>
-                    )}
+                      return (
+                        <button
+                          key={day}
+                          onClick={() => setSelectedCalendarDateStr(dateKey)}
+                          className={`aspect-square rounded-lg flex flex-col items-center justify-center p-0.5 relative cursor-pointer text-[10px] font-bold border transition-colors ${
+                            isSelected 
+                              ? 'bg-brand-primary border-brand-primary text-white shadow' 
+                              : isToday
+                                ? 'bg-primary-100/50 dark:bg-primary-950/20 border-brand-primary/30 text-text-primary font-extrabold'
+                                : 'bg-transparent border-transparent hover:bg-bg-primary text-text-secondary dark:text-slate-200'
+                          }`}
+                        >
+                          <span>{day}</span>
+                          {/* Dot indicator */}
+                          <div className="absolute bottom-0.5 flex gap-0.5">
+                            {indicators.hasExam && <span className="w-1 h-1 rounded-full bg-rose-500" />}
+                            {indicators.hasSession && <span className="w-1 h-1 rounded-full bg-cyan-500" />}
+                            {indicators.hasRevision && <span className="w-1 h-1 rounded-full bg-purple-500" />}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
-                </div>
 
-              </GlassCard>
+                  {/* Selected Day Agenda details sub-pane */}
+                  <div className="border-t border-border-primary/40 pt-3 mt-3">
+                    <span className="text-[9px] font-bold text-text-muted uppercase tracking-wider block mb-2">
+                      Agenda: {new Date(selectedCalendarDateStr).toLocaleDateString('default', { month: 'short', day: 'numeric' })}
+                    </span>
 
-              {/* Upcoming Exams Countdown */}
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                      {selectedCalendarExams.map(exam => (
+                        <div key={exam.id} className="p-2 rounded bg-rose-500/5 border border-rose-500/10 text-rose-800 dark:text-rose-200 text-[10px] font-bold text-left">
+                          Exam: {exam.name}
+                        </div>
+                      ))}
+                      
+                      {selectedCalendarCustomTasks.map(task => (
+                        <div key={task.id} className="p-2 rounded border border-border-primary/50 text-[10px] font-semibold text-text-secondary flex justify-between">
+                          <span className={task.completed ? 'line-through text-text-muted' : ''}>{task.title}</span>
+                          <span className="text-[9px] uppercase font-bold text-text-muted">{task.subject}</span>
+                        </div>
+                      ))}
+
+                      {selectedCalendarRevisionTasks.map(task => (
+                        <div key={task.id} className="p-2 rounded bg-brand-primary/5 border border-brand-primary/10 text-[10px] font-semibold text-text-secondary flex justify-between">
+                          <span className={task.completed ? 'line-through text-text-muted' : ''}>{task.title}</span>
+                          <span className="text-[8px] uppercase font-bold text-brand-primary">Revision</span>
+                        </div>
+                      ))}
+
+                      {selectedCalendarSessions.map(session => (
+                        <div key={session.id} className="p-2 rounded bg-cyan-500/5 border border-cyan-500/10 text-[10px] font-bold text-cyan-600 dark:text-cyan-400 flex justify-between">
+                          <span>Study Session</span>
+                          <span>{(session.durationMinutes / 60).toFixed(1)}h</span>
+                        </div>
+                      ))}
+
+                      {selectedCalendarExams.length === 0 && 
+                       selectedCalendarCustomTasks.length === 0 && 
+                       selectedCalendarRevisionTasks.length === 0 && 
+                       selectedCalendarSessions.length === 0 && (
+                        <span className="text-[10px] font-semibold text-text-muted">Clear schedule</span>
+                      )}
+                    </div>
+                  </div>
+                </GlassCard>
+              )}
+
+              {/* Upcoming Exams Milestone Tracker */}
               <GlassCard hover={false} className="p-5 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-3">
-                  <h2 className="font-heading font-black text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <CalendarIcon className="w-4.5 h-4.5 text-pink-500" />
+                <div className="flex items-center justify-between border-b border-border-primary/40 pb-3">
+                  <h3 className="font-heading font-black text-sm text-text-primary flex items-center gap-1.5">
+                    <CalendarIcon className="w-4.5 h-4.5 text-brand-primary" />
                     <span>Upcoming Exams</span>
-                  </h2>
+                  </h3>
+                  
                   <button 
-                    onClick={() => setShowExamForm(!showExamForm)}
                     ref={addExamButtonRef}
+                    onClick={() => setShowExamForm(!showExamForm)} 
+                    className="p-1 rounded bg-bg-primary text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
                     aria-label="Toggle add exam form"
-                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-primary-50 dark:bg-slate-800 dark:hover:bg-primary-950 text-slate-500 hover:text-primary-500 cursor-pointer transition-colors"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-4 h-4" />
                   </button>
                 </div>
 
                 {showExamForm && (
-                  <form onSubmit={handleAddExamSubmit} className="p-3.5 rounded-xl bg-slate-100/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800/80 space-y-2.5">
-                    <div>
-                      <label htmlFor="exam-name" className="text-[9px] font-bold text-slate-450 uppercase">Exam Name</label>
-                      <input 
-                        id="exam-name"
-                        ref={examNameInputRef}
-                        type="text" 
-                        required
-                        placeholder="e.g. Chemistry Assessment"
-                        value={newExamName}
-                        onChange={(e) => setNewExamName(e.target.value)}
-                        className="w-full text-xs font-semibold px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-805 dark:text-white"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
+                  <form onSubmit={handleAddExamSubmit} className="p-3.5 rounded-xl border border-border-primary bg-bg-primary space-y-3">
+                    <div className="space-y-2">
                       <div>
-                        <label htmlFor="exam-subject" className="text-[9px] font-bold text-slate-450 uppercase">Subject</label>
+                        <label htmlFor="exam-name" className="text-[9px] font-bold text-text-muted uppercase">Exam Name</label>
+                        <input 
+                          id="exam-name"
+                          ref={examNameInputRef}
+                          type="text" 
+                          required
+                          placeholder="e.g. Midterm 1" 
+                          value={newExamName}
+                          onChange={(e) => setNewExamName(e.target.value)}
+                          className="w-full text-xs font-semibold px-2 py-1 rounded-lg bg-surface-primary border border-border-primary focus:outline-none focus:ring-1 focus:ring-brand-primary text-text-primary"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="exam-subject" className="text-[9px] font-bold text-text-muted uppercase">Subject</label>
                         <select
                           id="exam-subject"
                           value={newExamSubject}
                           onChange={(e) => setNewExamSubject(e.target.value)}
-                          className="w-full text-xs font-semibold px-2 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-805 dark:text-white"
+                          className="w-full text-xs font-semibold px-2 py-1 rounded-lg bg-surface-primary border border-border-primary focus:outline-none focus:ring-1 focus:ring-brand-primary text-text-primary"
                         >
-                          <option>General</option>
-                          {plannerInput.subjects.map(s => (
-                            <option key={s}>{s}</option>
-                          ))}
+                          {plannerInput.subjects.length > 0 ? (
+                            plannerInput.subjects.map(sub => (
+                              <option key={sub} value={sub}>{sub}</option>
+                            ))
+                          ) : (
+                            <option value="General">General</option>
+                          )}
                         </select>
                       </div>
+
                       <div>
-                        <label htmlFor="exam-date" className="text-[9px] font-bold text-slate-450 uppercase">Date</label>
+                        <label htmlFor="exam-date" className="text-[9px] font-bold text-text-muted uppercase">Date</label>
                         <input 
                           id="exam-date"
                           type="date" 
                           required
                           value={newExamDate}
                           onChange={(e) => setNewExamDate(e.target.value)}
-                          className="w-full text-xs font-semibold px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-250 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-805 dark:text-white"
+                          className="w-full text-xs font-semibold px-2 py-1 rounded-lg bg-surface-primary border border-border-primary focus:outline-none focus:ring-1 focus:ring-brand-primary text-text-primary"
                         />
                       </div>
                     </div>
                     <button 
                       type="submit" 
-                      className="w-full py-2 bg-gradient-to-r from-primary-600 to-pink-500 text-white rounded-lg text-[10px] font-extrabold cursor-pointer hover:-translate-y-0.5 transition-all"
+                      className="w-full py-2 bg-gradient-to-r from-brand-primary to-pink-500 text-white rounded-lg text-[10px] font-extrabold cursor-pointer hover:-translate-y-0.5 transition-all"
                     >
                       Add Exam Countdown
                     </button>
@@ -966,8 +1197,10 @@ const Dashboard: React.FC = () => {
 
                 <div className="space-y-3">
                   {exams.length === 0 ? (
-                    <div className="text-center py-4 text-slate-450 dark:text-slate-500 font-semibold">
-                      Add your first exam to receive personalized study planning.
+                    <div className="text-center py-6 px-4 text-text-secondary border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10">
+                      <CalendarIcon className="w-8 h-8 text-brand-primary mx-auto mb-3 opacity-60" />
+                      <h4 className="font-heading font-black text-sm text-text-primary">No Exams Added</h4>
+                      <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">Add upcoming exams to map out prioritization countdown schedules.</p>
                     </div>
                   ) : (
                     exams.map(exam => {
@@ -975,20 +1208,20 @@ const Dashboard: React.FC = () => {
                       const isUrgent = daysLeft <= 3;
                       
                       return (
-                        <div key={exam.id} className="group relative flex items-start justify-between p-3.5 rounded-xl border border-slate-200/50 dark:border-slate-850/60 bg-white/30 dark:bg-slate-900/30">
-                          <div className="space-y-1">
-                            <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 bg-primary-500/10 text-primary-600 dark:text-primary-400 rounded">
+                        <div key={exam.id} className="group relative flex items-start justify-between p-3.5 rounded-xl border border-border-primary/50 bg-surface-primary/30">
+                          <div className="space-y-1 text-left">
+                            <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 bg-brand-primary/10 text-brand-primary rounded">
                               {exam.subject}
                             </span>
-                            <h4 className="font-bold text-xs text-slate-805 dark:text-slate-200 mt-1">{exam.name}</h4>
-                            <p className="text-[9px] font-semibold text-slate-450">{exam.date}</p>
+                            <h4 className="font-bold text-xs text-text-primary mt-1">{exam.name}</h4>
+                            <p className="text-[9px] font-semibold text-text-muted">{exam.date}</p>
                           </div>
                           
                           <div className="flex flex-col items-end gap-1.5">
                             <div className={`px-2 py-1 rounded-lg flex flex-col items-center justify-center font-heading ${
                               isUrgent 
                                 ? 'bg-rose-500/10 text-rose-500' 
-                                : 'bg-slate-100 dark:bg-slate-850 text-slate-500'
+                                : 'bg-bg-primary text-text-secondary'
                             }`}>
                               <span className="text-xs font-black leading-none">{daysLeft > 0 ? daysLeft : 0}</span>
                               <span className="text-[7px] font-black uppercase leading-none mt-0.5">days</span>
@@ -1015,7 +1248,8 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  </AnimatedPage>
+);
 };
 
 export default Dashboard;

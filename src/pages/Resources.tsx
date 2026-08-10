@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/layout/Sidebar';
 import GlassCard from '../components/ui/GlassCard';
+import AnimatedPage from '../components/layout/AnimatedPage';
+import Spotlight from '../components/ui/Spotlight';
 import { 
   Library, 
   Plus, 
@@ -106,31 +108,33 @@ const Resources: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-mesh text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <Sidebar />
+    <AnimatedPage>
+      <div className="min-h-screen bg-mesh text-text-primary dark:text-slate-100 transition-colors duration-300 relative">
+        <Spotlight />
+        <Sidebar />
+        
+        <div className="md:pl-64 min-h-screen transition-all duration-300">
+          <div className="pt-20 md:pt-8 p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+            {/* Header */}
+            <div>
+              <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-text-primary dark:text-text-primary">Resources & Study Notes</h1>
+              <p className="text-text-secondary dark:text-text-muted text-sm font-semibold">Store notes, review subject study guidelines, and customize your strategic cheat sheets.</p>
+            </div>
 
-      <div className="md:pl-64 min-h-screen transition-all duration-300">
-        <div className="pt-20 md:pt-8 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
-          {/* Header */}
-          <div>
-            <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-slate-900 dark:text-white">Resources & Study Notes</h1>
-            <p className="text-slate-600 dark:text-slate-400 text-sm font-semibold">Store notes, review subject study guidelines, and customize your strategic cheat sheets.</p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Notes Sidebar & Guidelines (1 Col) */}
             <div className="space-y-6">
               
               {/* Note creator widget */}
               <GlassCard hover={false} className="p-5 flex flex-col justify-between">
-                <div className="flex items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-3 mb-4">
-                  <h3 className="font-heading font-black text-md text-slate-850 dark:text-white flex items-center gap-2">
-                    <Library className="w-5 h-5 text-primary-500" />
+                <div className="flex items-center justify-between border-b border-border-primary/40 dark:border-border-primary/40 pb-3 mb-4">
+                  <h3 className="font-heading font-black text-md text-text-primary dark:text-text-primary flex items-center gap-2">
+                    <Library className="w-5 h-5 text-brand-primary" />
                     <span>My Notes</span>
                   </h3>
                   <button
                     onClick={handleCreateNote}
-                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-primary-50 dark:bg-slate-800 dark:hover:bg-primary-950 text-slate-500 hover:text-primary-500 transition-colors active:scale-95 cursor-pointer"
+                    className="p-1.5 rounded-lg bg-bg-primary hover:bg-primary-50 dark:bg-slate-800 dark:hover:bg-primary-950 text-text-secondary hover:text-brand-primary transition-colors active:scale-95 cursor-pointer"
                     aria-label="Create note"
                   >
                     <Plus className="w-4 h-4" />
@@ -140,7 +144,7 @@ const Resources: React.FC = () => {
                 {/* Notes List */}
                 <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
                   {notes.length === 0 ? (
-                    <div className="text-center py-8 text-slate-400 dark:text-slate-500">
+                    <div className="text-center py-8 text-text-muted dark:text-text-secondary">
                       <FileText className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                       <p className="text-xs font-semibold">No notes stored yet.</p>
                     </div>
@@ -151,19 +155,19 @@ const Resources: React.FC = () => {
                         onClick={() => selectNote(note)}
                         className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-colors cursor-pointer ${
                           selectedNoteId === note.id
-                            ? 'bg-primary-500/10 border-primary-500 text-primary-655 dark:text-primary-350'
-                            : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-slate-800/40 hover:bg-white dark:hover:bg-slate-850/60'
+                            ? 'bg-brand-primary/10 border-primary-500 text-brand-primary dark:text-primary-350'
+                            : 'bg-surface-primary/40 dark:bg-surface-primary/40 border-border-primary/50 dark:border-border-primary/40 hover:bg-surface-primary dark:hover:bg-slate-850/60'
                         }`}
                       >
                         <div className="overflow-hidden">
-                          <p className="text-xs font-bold truncate text-slate-800 dark:text-slate-200">{note.title}</p>
-                          <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 bg-slate-200/55 dark:bg-slate-800 text-slate-500 rounded mt-1.5 inline-block">
+                          <p className="text-xs font-bold truncate text-text-primary dark:text-slate-200">{note.title}</p>
+                          <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 bg-bg-primary/55 dark:bg-slate-800 text-text-secondary rounded mt-1.5 inline-block">
                             {note.subject}
                           </span>
                         </div>
                         <button
                           onClick={(e) => handleDeleteNote(note.id, e)}
-                          className="p-1 rounded-md text-slate-400 hover:text-red-500 transition-colors"
+                          className="p-1 rounded-md text-text-muted hover:text-red-500 transition-colors"
                           aria-label={`Delete note ${note.title}`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -176,14 +180,14 @@ const Resources: React.FC = () => {
 
               {/* Guidelines Card */}
               <GlassCard hover={false} className="p-5 bg-gradient-to-tr from-primary-600/5 to-transparent border border-primary-500/10">
-                <h3 className="font-heading font-black text-md text-slate-850 dark:text-white flex items-center gap-2 mb-4">
+                <h3 className="font-heading font-black text-md text-text-primary dark:text-text-primary flex items-center gap-2 mb-4">
                   <Lightbulb className="w-5 h-5 text-amber-500 animate-pulse" />
                   <span>Strategic Study Tips</span>
                 </h3>
                 <div className="space-y-4">
                   {studyGuides.map((guide, idx) => (
                     <div key={idx} className="space-y-1">
-                      <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-primary-500/10 text-primary-600 dark:text-primary-400">
+                      <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-brand-primary/10 text-brand-primary dark:text-brand-primary">
                         {guide.subject}
                       </span>
                       <p className="text-xs text-slate-655 dark:text-slate-350 font-semibold leading-relaxed">
@@ -202,19 +206,19 @@ const Resources: React.FC = () => {
                 {selectedNoteId ? (
                   <div className="space-y-4 flex flex-col h-full">
                     {/* Note title & subject */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between border-b border-border-primary/40 dark:border-border-primary/40 pb-4">
                       <input
                         type="text"
                         placeholder="Note Title"
                         value={noteTitle}
                         onChange={(e) => setNoteTitle(e.target.value)}
-                        className="font-heading font-black text-xl text-slate-850 dark:text-white bg-transparent border-none focus:outline-none placeholder-slate-400 w-full"
+                        className="font-heading font-black text-xl text-text-primary dark:text-text-primary bg-transparent border-none focus:outline-none placeholder-slate-400 w-full"
                       />
                       <div className="flex items-center gap-2 shrink-0">
                         <select
                           value={noteSubject}
                           onChange={(e) => setNoteSubject(e.target.value)}
-                          className="text-xs font-semibold px-2 py-1.5 rounded-lg bg-white/60 dark:bg-slate-900 border border-slate-250 dark:border-slate-800 focus:outline-none focus:ring-1 focus:ring-primary-500 text-slate-800 dark:text-white"
+                          className="text-xs font-semibold px-2 py-1.5 rounded-lg bg-surface-primary/60 dark:bg-surface-primary border border-border-primary dark:border-border-primary focus:outline-none focus:ring-1 focus:ring-primary-500 text-text-primary dark:text-text-primary"
                         >
                           <option value="General">General</option>
                           {plannerInput.subjects.map(s => (
@@ -223,7 +227,7 @@ const Resources: React.FC = () => {
                         </select>
                         <button
                           onClick={handleSaveNote}
-                          className="px-3.5 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-extrabold hover:bg-primary-500 transition-colors cursor-pointer flex items-center gap-1 shadow-sm"
+                          className="px-3.5 py-1.5 bg-brand-primary text-white rounded-lg text-xs font-extrabold hover:bg-brand-primary transition-colors cursor-pointer flex items-center gap-1 shadow-sm"
                         >
                           <Save className="w-3.5 h-3.5" />
                           <span>Save</span>
@@ -240,10 +244,10 @@ const Resources: React.FC = () => {
                     />
                   </div>
                 ) : (
-                  <div className="my-auto text-center py-20 text-slate-450 dark:text-slate-500">
-                    <Sparkles className="w-12 h-12 text-primary-500/20 mx-auto mb-3" />
-                    <h4 className="font-heading font-black text-lg text-slate-850 dark:text-white mb-1">Select or Create a Note</h4>
-                    <p className="text-xs font-semibold text-slate-500 mb-4">Draft review guides and keep summaries in a single place.</p>
+                  <div className="my-auto text-center py-20 text-text-muted dark:text-text-secondary">
+                    <Sparkles className="w-12 h-12 text-brand-primary/20 mx-auto mb-3" />
+                    <h4 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-1">Select or Create a Note</h4>
+                    <p className="text-xs font-semibold text-text-secondary mb-4">Draft review guides and keep summaries in a single place.</p>
                     <button
                       onClick={handleCreateNote}
                       className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-xs shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"
@@ -260,7 +264,8 @@ const Resources: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  </AnimatedPage>
+);
 };
 
 export default Resources;

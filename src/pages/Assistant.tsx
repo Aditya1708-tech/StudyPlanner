@@ -93,17 +93,17 @@ const Assistant: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-mesh text-slate-800 dark:text-slate-100 transition-colors duration-300">
+    <div className="min-h-screen bg-mesh text-text-primary dark:text-slate-100 transition-colors duration-300">
       <Sidebar />
 
       <div className="md:pl-64 min-h-screen transition-all duration-300 flex flex-col">
-        <div className="pt-20 md:pt-8 p-6 md:p-10 max-w-6xl w-full mx-auto flex-1 flex flex-col gap-6">
+        <div className="pt-20 md:pt-8 p-6 md:p-8 max-w-6xl w-full mx-auto flex-1 flex flex-col gap-6">
           
           {/* Page Header */}
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="font-heading font-black text-3xl tracking-tight text-slate-900 dark:text-white">AI Study Assistant</h1>
+                <h1 className="font-heading font-black text-3xl tracking-tight text-text-primary dark:text-text-primary">AI Study Assistant</h1>
                 {!ENV.GEMINI_API_KEY && (
                   <div className="relative group flex items-center shrink-0 mt-1">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 cursor-help shadow-sm">
@@ -115,7 +115,7 @@ const Assistant: React.FC = () => {
                   </div>
                 )}
               </div>
-              <p className="text-slate-600 dark:text-slate-400 text-sm font-semibold">Ask queries, explain concepts, or auto-schedule study plans.</p>
+              <p className="text-text-secondary dark:text-text-muted text-sm font-semibold">Ask queries, explain concepts, or auto-schedule study plans.</p>
             </div>
             
             <button
@@ -134,11 +134,11 @@ const Assistant: React.FC = () => {
             {/* Left Prompt Guide column (1 col on desktop) */}
             <div className="lg:col-span-1 space-y-4">
               <GlassCard hover={false} className="p-5 space-y-4 h-full flex flex-col">
-                <div className="flex items-center gap-1.5 text-slate-800 dark:text-white border-b border-slate-200/40 dark:border-slate-800/40 pb-3">
-                  <Sparkles className="w-4 h-4 text-primary-500" />
+                <div className="flex items-center gap-1.5 text-text-primary dark:text-text-primary border-b border-border-primary/40 dark:border-border-primary/40 pb-3">
+                  <Sparkles className="w-4 h-4 text-brand-primary" />
                   <span className="font-heading font-extrabold text-sm uppercase tracking-wide">Quick Prompts</span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">
+                <p className="text-xs text-text-secondary dark:text-text-muted font-semibold leading-relaxed">
                   Click any standard template prompt below to load a conversational plan instantly:
                 </p>
                 <div className="flex flex-row lg:flex-col gap-2.5 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
@@ -146,20 +146,20 @@ const Assistant: React.FC = () => {
                     <button
                       key={idx}
                       onClick={() => handlePromptClick(prompt.text)}
-                      className="whitespace-nowrap lg:whitespace-normal text-left px-3 py-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/85 bg-white/20 dark:bg-slate-900/20 hover:bg-primary-500/5 hover:border-primary-500/30 text-xs font-bold text-slate-655 dark:text-slate-350 hover:text-primary-600 dark:hover:text-primary-400 transition-all flex items-center justify-between gap-2 cursor-pointer min-h-[40px]"
+                      className="whitespace-nowrap lg:whitespace-normal text-left px-3 py-2.5 rounded-xl border border-border-primary/60 dark:border-border-primary/85 bg-surface-primary/20 dark:bg-surface-primary/20 hover:bg-brand-primary/5 hover:border-primary-500/30 text-xs font-bold text-slate-655 dark:text-slate-350 hover:text-brand-primary dark:hover:text-primary-400 transition-all flex items-center justify-between gap-2 cursor-pointer min-h-[40px]"
                     >
                       <span>{prompt.label}</span>
-                      <ArrowRight className="w-3 h-3 hidden lg:block text-slate-400 group-hover:text-primary-500" />
+                      <ArrowRight className="w-3 h-3 hidden lg:block text-text-muted group-hover:text-brand-primary" />
                     </button>
                   ))}
                 </div>
                 
                 {/* Visual AI Help Card */}
                 <div className="mt-auto hidden lg:block p-4 rounded-xl bg-gradient-to-tr from-primary-600/10 to-pink-500/10 border border-primary-500/15">
-                  <h4 className="font-extrabold text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
+                  <h4 className="font-extrabold text-xs text-brand-primary dark:text-brand-primary flex items-center gap-1">
                     <Terminal className="w-3.5 h-3.5" /> Tasks Integration
                   </h4>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-400 font-semibold mt-1">
+                  <p className="text-[10px] text-text-secondary dark:text-text-muted font-semibold mt-1">
                     Ask me: "Suggest a Chemistry schedule" and you can add tasks instantly via the chat window!
                   </p>
                 </div>
@@ -186,8 +186,8 @@ const Assistant: React.FC = () => {
                         {/* Avatar */}
                         <div className={`w-8.5 h-8.5 rounded-full shrink-0 flex items-center justify-center border font-bold text-xs ${
                           msg.sender === 'user'
-                            ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
-                            : 'bg-primary-500 border-primary-500 text-white shadow-md shadow-primary-500/15'
+                            ? 'bg-bg-primary dark:bg-slate-800 border-border-primary dark:border-slate-700 text-text-secondary dark:text-slate-300'
+                            : 'bg-brand-primary border-primary-500 text-white shadow-md '
                         }`}>
                           {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
                         </div>
@@ -197,7 +197,7 @@ const Assistant: React.FC = () => {
                           <div className={`px-4.5 py-3 rounded-2xl text-sm font-medium leading-relaxed ${
                             msg.sender === 'user'
                               ? 'bg-gradient-to-tr from-primary-600 to-indigo-650 text-white rounded-tr-none shadow-md'
-                              : 'bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-850/60 rounded-tl-none text-slate-750 dark:text-slate-250 shadow-sm'
+                              : 'bg-surface-primary dark:bg-surface-primary border border-border-primary/50 dark:border-border-primary/60 rounded-tl-none text-slate-750 dark:text-slate-250 shadow-sm'
                           }`}>
                             <p>{msg.text}</p>
                           </div>
@@ -210,11 +210,11 @@ const Assistant: React.FC = () => {
                                 return (
                                   <div 
                                     key={sIdx}
-                                    className="p-3.5 rounded-xl border border-primary-500/20 bg-primary-500/5 max-w-sm flex items-center justify-between gap-4 transition-all"
+                                    className="p-3.5 rounded-xl border border-primary-500/20 bg-brand-primary/5 max-w-sm flex items-center justify-between gap-4 transition-all"
                                   >
                                     <div>
-                                      <h5 className="font-extrabold text-xs text-slate-800 dark:text-white leading-snug">{task.title}</h5>
-                                      <p className="text-[10px] text-slate-500 mt-0.5">{task.subject} • {task.estimatedHours}h</p>
+                                      <h5 className="font-extrabold text-xs text-text-primary dark:text-text-primary leading-snug">{task.title}</h5>
+                                      <p className="text-[10px] text-text-secondary mt-0.5">{task.subject} • {task.estimatedHours}h</p>
                                     </div>
                                     <button
                                       onClick={() => handleAddSuggestedTask(task, msg.id)}
@@ -222,7 +222,7 @@ const Assistant: React.FC = () => {
                                       className={`shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-black text-[10px] transition-all active:scale-95 cursor-pointer min-h-[32px] ${
                                         isAdded 
                                           ? 'bg-emerald-500 text-white cursor-default'
-                                          : 'bg-primary-650 hover:bg-primary-600 text-white hover:shadow shadow-primary-500/10'
+                                          : 'bg-primary-650 hover:bg-brand-primary text-white hover:shadow '
                                       }`}
                                     >
                                       {isAdded ? (
@@ -250,13 +250,13 @@ const Assistant: React.FC = () => {
                   {/* Typing Loader */}
                   {isTyping && (
                     <div className="flex items-center gap-3.5 mr-auto max-w-[80%]">
-                      <div className="w-8.5 h-8.5 rounded-full bg-primary-500 text-white flex items-center justify-center animate-pulse shadow-md">
+                      <div className="w-8.5 h-8.5 rounded-full bg-brand-primary text-white flex items-center justify-center animate-pulse shadow-md">
                         <Sparkles className="w-4 h-4" />
                       </div>
-                      <div className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-850/60 rounded-2xl rounded-tl-none px-5 py-3 shadow-sm">
+                      <div className="bg-surface-primary dark:bg-surface-primary border border-border-primary/50 dark:border-border-primary/60 rounded-2xl rounded-tl-none px-5 py-3 shadow-sm">
                         <div className="flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 bg-primary-450 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                          <span className="w-2.5 h-2.5 bg-primary-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                          <span className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                           <span className="w-2.5 h-2.5 bg-primary-555 rounded-full animate-bounce"></span>
                         </div>
                       </div>
@@ -267,18 +267,18 @@ const Assistant: React.FC = () => {
                 </div>
 
                 {/* Bottom Input Area */}
-                <form onSubmit={handleSubmit} className="mt-4 pt-3 border-t border-slate-200/40 dark:border-slate-800/40 flex items-center gap-3">
+                <form onSubmit={handleSubmit} className="mt-4 pt-3 border-t border-border-primary/40 dark:border-border-primary/40 flex items-center gap-3">
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Ask study tips, explain 'molecular orbitals', or type standard queries..."
-                    className="flex-1 px-4 py-3.5 text-sm font-semibold rounded-xl bg-slate-100/55 dark:bg-slate-900/60 border border-slate-250 dark:border-slate-855 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500/70 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 min-h-[48px]"
+                    className="flex-1 px-4 py-3.5 text-sm font-semibold rounded-xl bg-bg-primary/55 dark:bg-surface-primary/60 border border-border-primary dark:border-border-primary focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary/70 text-text-primary placeholder-text-muted min-h-[48px]"
                   />
                   <button
                     type="submit"
                     aria-label="Send message"
-                    className="p-3.5 rounded-xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold shadow-lg shadow-primary-500/20 hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer min-h-[48px] flex items-center justify-center"
+                    className="p-3.5 rounded-xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold shadow-lg  hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer min-h-[48px] flex items-center justify-center"
                   >
                     <Send className="w-4.5 h-4.5" />
                   </button>

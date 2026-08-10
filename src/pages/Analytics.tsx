@@ -80,17 +80,17 @@ const Analytics: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-mesh text-slate-800 dark:text-slate-100 transition-colors duration-300">
+    <div className="min-h-screen bg-mesh text-text-primary dark:text-slate-100 transition-colors duration-300">
       <Sidebar />
 
       <div className="md:pl-64 min-h-screen transition-all duration-300">
         {/* Switched from <main> to <div> since global landmark wraps routing shell */}
-        <div className="pt-20 md:pt-8 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+        <div className="pt-20 md:pt-8 p-6 md:p-8 max-w-7xl mx-auto space-y-8">
           
           {/* Header */}
           <div>
-            <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-slate-900 dark:text-white">Analytics & Insights</h1>
-            <p className="text-slate-600 dark:text-slate-400 text-sm font-semibold">Visualize your study schedules, hourly logs, and AI diagnostic feedback.</p>
+            <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-text-primary dark:text-text-primary">Analytics & Insights</h1>
+            <p className="text-text-secondary dark:text-text-muted text-sm font-semibold">Visualize your study schedules, hourly logs, and AI diagnostic feedback.</p>
           </div>
 
           {/* Quick Summary Cards */}
@@ -98,13 +98,13 @@ const Analytics: React.FC = () => {
             
             {/* Hours card */}
             <GlassCard hover={false} className="flex flex-col justify-between h-44">
-              <div className="flex items-center justify-between border-b border-slate-200/20 dark:border-slate-800/40 pb-3">
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase">Weekly Hours</span>
-                <Clock className="w-4.5 h-4.5 text-primary-500" />
+              <div className="flex items-center justify-between border-b border-border-primary/20 dark:border-border-primary/40 pb-3">
+                <span className="text-xs font-bold text-text-secondary dark:text-text-secondary uppercase">Weekly Hours</span>
+                <Clock className="w-4.5 h-4.5 text-brand-primary" />
               </div>
               <div className="my-auto pt-2">
-                <h3 className="font-heading font-black text-4xl text-slate-800 dark:text-white leading-none">{totalStudyHoursThisWeek} hrs</h3>
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-2 flex items-center gap-1">
+                <h3 className="font-heading font-black text-4xl text-text-primary dark:text-text-primary leading-none">{totalStudyHoursThisWeek} hrs</h3>
+                <p className="text-xs font-semibold text-text-secondary dark:text-text-muted mt-2 flex items-center gap-1">
                   <span className="text-emerald-500 flex items-center"><ArrowUpRight className="w-3.5 h-3.5" /> +12%</span> vs last week
                 </p>
               </div>
@@ -112,13 +112,13 @@ const Analytics: React.FC = () => {
 
             {/* Task completion rate card */}
             <GlassCard hover={false} className="flex flex-col justify-between h-44">
-              <div className="flex items-center justify-between border-b border-slate-200/20 dark:border-slate-800/40 pb-3">
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase">Task Completion</span>
+              <div className="flex items-center justify-between border-b border-border-primary/20 dark:border-border-primary/40 pb-3">
+                <span className="text-xs font-bold text-text-secondary dark:text-text-secondary uppercase">Task Completion</span>
                 <CheckSquare className="w-4.5 h-4.5 text-cyan-500" />
               </div>
               <div className="my-auto pt-2">
-                <h3 className="font-heading font-black text-4xl text-slate-850 dark:text-white leading-none">{completionPercentage}%</h3>
-                <div className="w-full bg-slate-100 dark:bg-slate-900 h-1.5 mt-3 overflow-hidden border border-slate-200/10">
+                <h3 className="font-heading font-black text-4xl text-text-primary dark:text-text-primary leading-none">{completionPercentage}%</h3>
+                <div className="w-full bg-bg-primary dark:bg-surface-primary h-1.5 mt-3 overflow-hidden border border-border-primary/10">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${completionPercentage}%` }}
@@ -126,19 +126,19 @@ const Analytics: React.FC = () => {
                     className="h-full bg-gradient-to-r from-primary-500 to-cyan-500 rounded-full" 
                   />
                 </div>
-                <p className="text-[10px] text-slate-500 font-semibold mt-2">{completedTasksCount} of {totalTasks} planner targets completed</p>
+                <p className="text-[10px] text-text-secondary font-semibold mt-2">{completedTasksCount} of {totalTasks} planner targets completed</p>
               </div>
             </GlassCard>
 
             {/* Streak Card */}
             <GlassCard hover={false} className="flex flex-col justify-between h-44">
-              <div className="flex items-center justify-between border-b border-slate-200/20 dark:border-slate-800/40 pb-3">
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase">Current Streak</span>
+              <div className="flex items-center justify-between border-b border-border-primary/20 dark:border-border-primary/40 pb-3">
+                <span className="text-xs font-bold text-text-secondary dark:text-text-secondary uppercase">Current Streak</span>
                 <Flame className="w-4.5 h-4.5 text-orange-500" />
               </div>
               <div className="my-auto pt-2">
-                <h3 className="font-heading font-black text-4xl text-slate-850 dark:text-white leading-none">5 Days</h3>
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-2">
+                <h3 className="font-heading font-black text-4xl text-text-primary dark:text-text-primary leading-none">5 Days</h3>
+                <p className="text-xs font-semibold text-text-secondary dark:text-text-muted mt-2">
                   Top 8% of active learners this week! 🔥
                 </p>
               </div>
@@ -151,17 +151,17 @@ const Analytics: React.FC = () => {
             
             {/* Weekly Hours Bar Chart */}
             <GlassCard hover={false} className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-200/20 dark:border-slate-800/40 pb-4">
-                <h3 className="font-heading font-black text-lg text-slate-900 dark:text-white flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-primary-500" />
+              <div className="flex items-center justify-between border-b border-border-primary/20 dark:border-border-primary/40 pb-4">
+                <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-brand-primary" />
                   <span>Weekly Study Log</span>
                 </h3>
-                <span className="text-xs font-semibold text-slate-500">Hours per Day</span>
+                <span className="text-xs font-semibold text-text-secondary">Hours per Day</span>
               </div>
 
               {/* Chart Plot Area with accessible landmarks */}
               <div 
-                className="h-56 flex items-end justify-between px-2 pt-6 relative border-b border-slate-200/40 dark:border-slate-800/40"
+                className="h-56 flex items-end justify-between px-2 pt-6 relative border-b border-border-primary/40 dark:border-border-primary/40"
                 role="img"
                 aria-label="Bar chart showing the study hours logged each day, ranging from Monday to Sunday"
               >
@@ -180,12 +180,12 @@ const Analytics: React.FC = () => {
                           initial={{ height: 0 }}
                           animate={{ height: `${pctHeight}%` }}
                           transition={{ duration: 0.8, delay: idx * 0.05 }}
-                          className="w-full rounded-t-lg bg-gradient-to-t from-primary-600/70 to-primary-500 group-hover:from-primary-500 group-hover:to-pink-500 transition-colors shadow-lg shadow-primary-500/5" 
+                          className="w-full rounded-t-lg bg-gradient-to-t from-primary-600/70 to-primary-500 group-hover:from-primary-500 group-hover:to-pink-500 transition-colors shadow-lg " 
                         />
                       </div>
                       
                       {/* Label */}
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-500">{item.day}</span>
+                      <span className="text-[10px] font-bold text-text-secondary dark:text-text-secondary">{item.day}</span>
                     </div>
                   );
                 })}
@@ -194,12 +194,12 @@ const Analytics: React.FC = () => {
 
             {/* Subject Distribution Progress Bars */}
             <GlassCard hover={false} className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-200/20 dark:border-slate-800/40 pb-4">
-                <h3 className="font-heading font-black text-lg text-slate-900 dark:text-white flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-border-primary/20 dark:border-border-primary/40 pb-4">
+                <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary flex items-center gap-2">
                   <PieChart className="w-5 h-5 text-pink-500" />
                   <span>Subject Time Distribution</span>
                 </h3>
-                <span className="text-xs font-semibold text-slate-500">Based on completed tasks</span>
+                <span className="text-xs font-semibold text-text-secondary">Based on completed tasks</span>
               </div>
 
               <div 
@@ -214,9 +214,9 @@ const Analytics: React.FC = () => {
                         <span className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
                         {item.subject}
                       </span>
-                      <span className="text-slate-500">{item.hours} hrs ({item.percentage}%)</span>
+                      <span className="text-text-secondary">{item.hours} hrs ({item.percentage}%)</span>
                     </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-200/10">
+                    <div className="w-full bg-bg-primary dark:bg-surface-primary h-2 rounded-full overflow-hidden border border-border-primary/10">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${item.percentage}%` }}
@@ -233,13 +233,13 @@ const Analytics: React.FC = () => {
 
           {/* AI Insights & Performance Diagnostic Reports */}
           <GlassCard hover={false} className="space-y-6 border border-primary-500/20 bg-gradient-to-tr from-primary-600/5 to-transparent">
-            <div className="flex items-center gap-2 border-b border-slate-200/20 dark:border-slate-800/40 pb-4">
-              <div className="w-9 h-9 rounded-xl bg-primary-500 text-white flex items-center justify-center shadow-lg shadow-primary-500/15">
+            <div className="flex items-center gap-2 border-b border-border-primary/20 dark:border-border-primary/40 pb-4">
+              <div className="w-9 h-9 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-lg ">
                 <BrainCircuit className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-heading font-black text-lg text-slate-900 dark:text-white">AI Diagnostic Insights</h3>
-                <p className="text-[9px] uppercase font-bold text-primary-500">Automated performance audits</p>
+                <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary">AI Diagnostic Insights</h3>
+                <p className="text-[9px] uppercase font-bold text-brand-primary">Automated performance audits</p>
               </div>
             </div>
 
@@ -247,13 +247,13 @@ const Analytics: React.FC = () => {
               {aiInsights.map((insight, idx) => (
                 <div 
                   key={idx} 
-                  className="p-4 rounded-xl border border-slate-250/20 dark:border-slate-800/60 bg-white/20 dark:bg-slate-900/20 space-y-2 hover:border-primary-500/20 hover:bg-white/40 dark:hover:bg-slate-900/35 transition-all"
+                  className="p-4 rounded-xl border border-border-primary/20 dark:border-border-primary/60 bg-surface-primary/20 dark:bg-surface-primary/20 space-y-2 hover:border-primary-500/20 hover:bg-surface-primary/40 dark:hover:bg-slate-900/35 transition-all"
                 >
-                  <h4 className="font-extrabold text-sm text-slate-800 dark:text-slate-150 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-primary-500" />
+                  <h4 className="font-extrabold text-sm text-text-primary dark:text-slate-150 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-brand-primary" />
                     {insight.title}
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold leading-relaxed">
+                  <p className="text-xs text-text-secondary dark:text-text-muted font-semibold leading-relaxed">
                     "{insight.text}"
                   </p>
                 </div>

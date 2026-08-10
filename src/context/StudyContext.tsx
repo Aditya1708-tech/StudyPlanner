@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import { Task, Exam, ChatMessage, PlannerInput, StudyDay, StudyPlanMetadata, StudySession } from '../types';
 import { useToast } from './ToastContext';
 import { getSimpleHash, SeededRandom } from '../utils/random';
+import { AuthContext } from './AuthContext';
 
 interface StudyContextType {
   theme: string;
@@ -65,57 +66,225 @@ const defaultPlannerInput: PlannerInput = {
   dailyHours: 4
 };
 
+// Demo Mode static data helper generators using dynamic dates relative to today
+const getRelativeDateStr = (offsetDays: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().split('T')[0];
+};
+
+const getCuratedTasks = (): Task[] => [
+  { id: 'curated-task-7', title: 'Download Chemistry past papers', subject: 'Chemistry', dueDate: getRelativeDateStr(-1), priority: 'Low', completed: true, estimatedHours: 1.0 },
+  { id: 'curated-task-8', title: 'Calculus homework set 4 problems 1-10', subject: 'Calculus III', dueDate: getRelativeDateStr(0), priority: 'High', completed: false, estimatedHours: 2.0 },
+  { id: 'curated-task-9', title: 'Review Physics Gauss\'s law formula card', subject: 'Physics II', dueDate: getRelativeDateStr(1), priority: 'Medium', completed: false, estimatedHours: 1.5 }
+];
+
+const getCuratedExams = (): Exam[] => [
+  { id: 'curated-exam-1', name: 'Chemistry Midterm', subject: 'Chemistry', date: getRelativeDateStr(4), location: 'Science Hall 301' },
+  { id: 'curated-exam-2', name: 'Calculus Final', subject: 'Calculus III', date: getRelativeDateStr(12), location: 'Math Tower Rm 102' }
+];
+
+const getCuratedMessages = (): ChatMessage[] => [
+  { id: 'msg-1', sender: 'ai', text: "Hello! I am your StudyAI assistant. I can analyze your study tasks, create structured review plans, explain complex topics, or generate new tasks directly for your calendar. What subject are we tackling today?", timestamp: new Date(Date.now() - 3600000 * 2).toISOString() },
+  { id: 'msg-2', sender: 'user', text: "Can you explain the main difference between first-order and second-order reactions in Chemistry?", timestamp: new Date(Date.now() - 3600000 * 1.9).toISOString() },
+  { id: 'msg-3', sender: 'ai', text: "Certainly! In first-order reactions, the reaction rate depends linearly on the concentration of a single reactant. In contrast, in second-order reactions, the rate depends either on the square of one reactant's concentration or on the product of two different reactants. Visually, a first-order reaction has a constant half-life, whereas a second-order half-life increases as concentration decreases.", timestamp: new Date(Date.now() - 3600000 * 1.8).toISOString() }
+];
+
+const getCuratedSessions = (): StudySession[] => [
+  { id: 'sess-0', subject: 'Chemistry', durationMinutes: 90, date: getRelativeDateStr(0), timestamp: new Date().toISOString() },
+  { id: 'sess-1', subject: 'Calculus III', durationMinutes: 120, date: getRelativeDateStr(-1), timestamp: new Date(Date.now() - 86400000).toISOString() },
+  { id: 'sess-2', subject: 'Physics II', durationMinutes: 60, date: getRelativeDateStr(-2), timestamp: new Date(Date.now() - 86400000 * 2).toISOString() },
+  { id: 'sess-3', subject: 'Linear Algebra', durationMinutes: 150, date: getRelativeDateStr(-3), timestamp: new Date(Date.now() - 86400000 * 3).toISOString() },
+  { id: 'sess-4', subject: 'Organic Chemistry', durationMinutes: 110, date: getRelativeDateStr(-4), timestamp: new Date(Date.now() - 86400000 * 4).toISOString() },
+  { id: 'sess-5', subject: 'Chemistry', durationMinutes: 80, date: getRelativeDateStr(-5), timestamp: new Date(Date.now() - 86400000 * 5).toISOString() },
+  { id: 'sess-6', subject: 'Calculus III', durationMinutes: 100, date: getRelativeDateStr(-6), timestamp: new Date(Date.now() - 86400000 * 6).toISOString() }
+];
+
+const getCuratedPlannerInput = (): PlannerInput => ({
+  subjects: ['Chemistry', 'Calculus III', 'Physics II', 'Linear Algebra', 'Organic Chemistry'],
+  examDates: {
+    'Chemistry': getRelativeDateStr(4),
+    'Calculus III': getRelativeDateStr(12)
+  },
+  dailyHours: 4
+});
+
+const getCuratedStudyPlan = (): StudyDay[] => [
+  {
+    date: getRelativeDateStr(0),
+    tasks: [
+      { id: 'plan-task-1', title: 'Review Chemistry organic mechanism questions', subject: 'Chemistry', estimatedHours: 1.5, completed: true, isGenerated: true, dueDate: getRelativeDateStr(0), priority: 'High' },
+      { id: 'plan-task-2', title: 'Solve Calculus triple integration review worksheet', subject: 'Calculus III', estimatedHours: 2.0, completed: false, isGenerated: true, dueDate: getRelativeDateStr(0), priority: 'High' },
+      { id: 'plan-task-3', title: 'Read Physics electromagnetism lecture 6 notes', subject: 'Physics II', estimatedHours: 1.0, completed: false, isGenerated: true, dueDate: getRelativeDateStr(0), priority: 'Medium' }
+    ]
+  },
+  {
+    date: getRelativeDateStr(1),
+    tasks: [
+      { id: 'plan-task-4', title: 'Linear Algebra homework section 4.2', subject: 'Linear Algebra', estimatedHours: 1.5, completed: false, isGenerated: true, dueDate: getRelativeDateStr(1), priority: 'Medium' },
+      { id: 'plan-task-5', title: 'Read Physics wave motion textbook chapter 8', subject: 'Physics II', estimatedHours: 2.0, completed: false, isGenerated: true, dueDate: getRelativeDateStr(1), priority: 'Low' }
+    ]
+  },
+  {
+    date: getRelativeDateStr(2),
+    tasks: [
+      { id: 'plan-task-6', title: 'Organic Chemistry reaction pathway project draft', subject: 'Organic Chemistry', estimatedHours: 3.0, completed: false, isGenerated: true, dueDate: getRelativeDateStr(2), priority: 'High' }
+    ]
+  }
+];
+
+const getCuratedStudyPlanMetadata = (): StudyPlanMetadata => ({
+  generationSource: 'demo',
+  promptVersion: 'v2',
+  generatedAt: new Date().toISOString(),
+  estimatedDifficulty: 'medium'
+});
+
 export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { showToast } = useToast();
+  const auth = useContext(AuthContext);
+  const isDemoMode = auth ? auth.isDemoMode : false;
+
+  // Tracks if the component has processed initial demo setup
+  const [prevIsDemo, setPrevIsDemo] = useState(() => localStorage.getItem('is_demo_mode') === 'true');
 
   // Theme state
   const [theme, setTheme] = useState<string>(() => {
     const saved = localStorage.getItem('theme');
-    if (saved) return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return saved ? saved : 'light';
   });
 
-  // Tasks state
+  // Tasks state (overwrites with curated on page refresh if in demo mode)
   const [tasks, setTasks] = useState<Task[]>(() => {
+    if (localStorage.getItem('is_demo_mode') === 'true') {
+      return getCuratedTasks();
+    }
     const saved = localStorage.getItem('tasks');
     return saved ? JSON.parse(saved) : defaultTasks;
   });
 
   // Exams state
   const [exams, setExams] = useState<Exam[]>(() => {
+    if (localStorage.getItem('is_demo_mode') === 'true') {
+      return getCuratedExams();
+    }
     const saved = localStorage.getItem('exams');
     return saved ? JSON.parse(saved) : defaultExams;
   });
 
   // Chat messages state
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (localStorage.getItem('is_demo_mode') === 'true') {
+      return getCuratedMessages();
+    }
     const saved = localStorage.getItem('chat_messages');
     return saved ? JSON.parse(saved) : defaultMessages;
   });
 
   // Study sessions state
   const [studySessions, setStudySessions] = useState<StudySession[]>(() => {
+    if (localStorage.getItem('is_demo_mode') === 'true') {
+      return getCuratedSessions();
+    }
     const saved = localStorage.getItem('study_sessions');
     return saved ? JSON.parse(saved) : [];
   });
 
   // AI Study Planner input
   const [plannerInput, setPlannerInput] = useState<PlannerInput>(() => {
+    if (localStorage.getItem('is_demo_mode') === 'true') {
+      return getCuratedPlannerInput();
+    }
     const saved = localStorage.getItem('planner_input');
     return saved ? JSON.parse(saved) : defaultPlannerInput;
   });
 
   // AI Study Plan output (day-by-day study tasks)
   const [studyPlan, setStudyPlan] = useState<StudyDay[]>(() => {
+    if (localStorage.getItem('is_demo_mode') === 'true') {
+      return getCuratedStudyPlan();
+    }
     const saved = localStorage.getItem('study_plan');
     return saved ? JSON.parse(saved) : [];
   });
 
   // AI Study Plan metadata (generation source, prompt version, difficulty)
   const [studyPlanMetadata, setStudyPlanMetadata] = useState<StudyPlanMetadata | null>(() => {
+    if (localStorage.getItem('is_demo_mode') === 'true') {
+      return getCuratedStudyPlanMetadata();
+    }
     const saved = localStorage.getItem('study_plan_metadata');
     return saved ? JSON.parse(saved) : null;
   });
+
+  // Demo state active transitions
+  useEffect(() => {
+    if (isDemoMode && !prevIsDemo) {
+      // ENTERING DEMO MODE
+      // 1. Back up existing user workspace data
+      const keys = ['tasks', 'exams', 'chat_messages', 'study_sessions', 'planner_input', 'study_plan', 'study_plan_metadata'];
+      keys.forEach(k => {
+        const val = localStorage.getItem(k);
+        if (val !== null) {
+          localStorage.setItem(`backup_demo_${k}`, val);
+        } else {
+          localStorage.removeItem(`backup_demo_${k}`);
+        }
+      });
+
+      // 2. Load curated datasets into state
+      setTasks(getCuratedTasks());
+      setExams(getCuratedExams());
+      setMessages(getCuratedMessages());
+      setStudySessions(getCuratedSessions());
+      setPlannerInput(getCuratedPlannerInput());
+      setStudyPlan(getCuratedStudyPlan());
+      setStudyPlanMetadata(getCuratedStudyPlanMetadata());
+      setPrevIsDemo(true);
+    } else if (!isDemoMode && prevIsDemo) {
+      // EXITING DEMO MODE
+      // 1. Clear active demo values
+      const keys = ['tasks', 'exams', 'chat_messages', 'study_sessions', 'planner_input', 'study_plan', 'study_plan_metadata'];
+      keys.forEach(k => localStorage.removeItem(k));
+
+      // 2. Restore backed up values
+      const restTasks: Task[] = [];
+      const restExams: Exam[] = [];
+      const restMessages: ChatMessage[] = [...defaultMessages];
+      const restSessions: StudySession[] = [];
+      let restPlannerInput = defaultPlannerInput;
+      let restStudyPlan: StudyDay[] = [];
+      let restMetadata: StudyPlanMetadata | null = null;
+
+      keys.forEach(k => {
+        const val = localStorage.getItem(`backup_demo_${k}`);
+        if (val !== null) {
+          localStorage.setItem(k, val);
+          localStorage.removeItem(`backup_demo_${k}`);
+          const parsed = JSON.parse(val);
+          if (k === 'tasks') restTasks.push(...parsed);
+          else if (k === 'exams') restExams.push(...parsed);
+          else if (k === 'chat_messages') {
+            restMessages.length = 0;
+            restMessages.push(...parsed);
+          }
+          else if (k === 'study_sessions') restSessions.push(...parsed);
+          else if (k === 'planner_input') restPlannerInput = parsed;
+          else if (k === 'study_plan') restStudyPlan = parsed;
+          else if (k === 'study_plan_metadata') restMetadata = parsed;
+        }
+      });
+
+      setTasks(restTasks);
+      setExams(restExams);
+      setMessages(restMessages);
+      setStudySessions(restSessions);
+      setPlannerInput(restPlannerInput);
+      setStudyPlan(restStudyPlan);
+      setStudyPlanMetadata(restMetadata);
+      setPrevIsDemo(false);
+    }
+  }, [isDemoMode, prevIsDemo]);
 
   // Sync theme to DOM
   useEffect(() => {

@@ -34,7 +34,7 @@ const GlassCard: React.FC<GlassCardProps> = ({
       transition={{ duration: 0.4, delay }}
       {...hoverProps}
       onClick={onClick}
-      className={`rounded-2xl p-6 ${cardClass} ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`rounded-3xl p-6 ${cardClass} ${onClick ? 'cursor-pointer' : ''} ${className}`}
       {...props}
     >
       {children}

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useStudy } from '../context/StudyContext';
 import Sidebar from '../components/layout/Sidebar';
 import GlassCard from '../components/ui/GlassCard';
+import AnimatedPage from '../components/layout/AnimatedPage';
+import Spotlight from '../components/ui/Spotlight';
 import { BookOpen, Plus, Trash2, Calendar, CheckSquare, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -57,21 +59,23 @@ const Subjects: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-mesh text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <Sidebar />
+    <AnimatedPage>
+      <div className="min-h-screen bg-mesh text-text-primary dark:text-slate-100 transition-colors duration-300 relative">
+        <Spotlight />
+        <Sidebar />
+        
+        <div className="md:pl-64 min-h-screen transition-all duration-300">
+          <div className="pt-20 md:pt-8 p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+            {/* Header */}
+            <div>
+              <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-text-primary dark:text-text-primary">Subjects Management</h1>
+              <p className="text-text-secondary dark:text-text-muted text-sm font-semibold">Organize your academic curriculum, track study hours, and monitor task completion by subject.</p>
+            </div>
 
-      <div className="md:pl-64 min-h-screen transition-all duration-300">
-        <div className="pt-20 md:pt-8 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
-          {/* Header */}
-          <div>
-            <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-slate-900 dark:text-white">Subjects Management</h1>
-            <p className="text-slate-600 dark:text-slate-400 text-sm font-semibold">Organize your academic curriculum, track study hours, and monitor task completion by subject.</p>
-          </div>
-
-          {/* Add Subject form */}
+            {/* Add Subject form */}
           <GlassCard hover={false} className="max-w-md">
-            <h3 className="font-heading font-black text-lg text-slate-850 dark:text-white mb-4 flex items-center gap-2">
-              <Plus className="w-5 h-5 text-primary-500" />
+            <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-4 flex items-center gap-2">
+              <Plus className="w-5 h-5 text-brand-primary" />
               <span>Add New Subject</span>
             </h3>
             <form onSubmit={handleAddSubject} className="flex gap-2">
@@ -81,7 +85,7 @@ const Subjects: React.FC = () => {
                 placeholder="e.g. Chemistry, Calculus, World History"
                 value={newSubject}
                 onChange={(e) => setNewSubject(e.target.value)}
-                className="flex-1 text-xs font-semibold px-4 py-2.5 rounded-xl bg-white/50 dark:bg-slate-950/50 border border-slate-250 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-800 dark:text-white min-h-[44px]"
+                className="flex-1 text-xs font-semibold px-4 py-2.5 rounded-xl bg-surface-primary/50 dark:bg-bg-primary/50 border border-border-primary dark:border-border-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-text-primary dark:text-text-primary min-h-[44px]"
               />
               <button
                 type="submit"
@@ -102,11 +106,11 @@ const Subjects: React.FC = () => {
           >
             {plannerInput.subjects.length === 0 ? (
               <div className="col-span-full text-center py-12">
-                <div className="w-16 h-16 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-500 border border-primary-500/20 mx-auto mb-4">
+                <div className="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center text-brand-primary border border-primary-500/20 mx-auto mb-4">
                   <BookOpen className="w-8 h-8" />
                 </div>
-                <h4 className="font-heading font-black text-lg text-slate-850 dark:text-white mb-1">No subjects configured</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-4">Add your first academic subject above to start organizing your study center.</p>
+                <h4 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-1">No subjects configured</h4>
+                <p className="text-xs text-text-secondary dark:text-text-muted font-semibold mb-4">Add your first academic subject above to start organizing your study center.</p>
               </div>
             ) : (
               plannerInput.subjects.map((subject) => {
@@ -118,32 +122,32 @@ const Subjects: React.FC = () => {
                       <button
                         onClick={() => deleteSubject(subject)}
                         aria-label={`Delete ${subject}`}
-                        className="absolute top-4 right-4 p-2 rounded-lg bg-slate-100 hover:bg-red-50 dark:bg-slate-800/60 dark:hover:bg-red-950/30 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer focus:opacity-100"
+                        className="absolute top-4 right-4 p-2 rounded-lg bg-bg-primary hover:bg-red-50 dark:bg-slate-800/60 dark:hover:bg-red-950/30 text-text-muted hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer focus:opacity-100"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
 
                       <div className="space-y-1 pr-8">
-                        <span className="text-[10px] font-bold text-primary-500 uppercase tracking-widest">Subject Course</span>
-                        <h3 className="font-heading font-black text-xl text-slate-850 dark:text-white leading-tight mt-0.5">{subject}</h3>
+                        <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest">Subject Course</span>
+                        <h3 className="font-heading font-black text-xl text-text-primary dark:text-text-primary leading-tight mt-0.5">{subject}</h3>
                       </div>
 
                       {/* Stats grid */}
-                      <div className="grid grid-cols-3 gap-2 border-t border-slate-200/40 dark:border-slate-850/40 pt-4 mt-auto">
+                      <div className="grid grid-cols-3 gap-2 border-t border-border-primary/40 dark:border-border-primary/40 pt-4 mt-auto">
                         <div className="text-center">
-                          <CheckSquare className="w-4 h-4 mx-auto text-slate-400 mb-1" />
-                          <p className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase">Tasks</p>
-                          <p className="font-heading font-black text-sm text-slate-800 dark:text-white mt-0.5">{stats.completedTasks}/{stats.totalTasks}</p>
+                          <CheckSquare className="w-4 h-4 mx-auto text-text-muted mb-1" />
+                          <p className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase">Tasks</p>
+                          <p className="font-heading font-black text-sm text-text-primary dark:text-text-primary mt-0.5">{stats.completedTasks}/{stats.totalTasks}</p>
                         </div>
                         <div className="text-center">
-                          <Clock className="w-4 h-4 mx-auto text-slate-400 mb-1" />
-                          <p className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase">Studied</p>
-                          <p className="font-heading font-black text-sm text-slate-800 dark:text-white mt-0.5">{stats.hoursStudied}h</p>
+                          <Clock className="w-4 h-4 mx-auto text-text-muted mb-1" />
+                          <p className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase">Studied</p>
+                          <p className="font-heading font-black text-sm text-text-primary dark:text-text-primary mt-0.5">{stats.hoursStudied}h</p>
                         </div>
                         <div className="text-center">
-                          <Calendar className="w-4 h-4 mx-auto text-slate-400 mb-1" />
-                          <p className="text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase">Exams</p>
-                          <p className="font-heading font-black text-sm text-slate-800 dark:text-white mt-0.5">{stats.examCount}</p>
+                          <Calendar className="w-4 h-4 mx-auto text-text-muted mb-1" />
+                          <p className="text-[10px] font-bold text-text-muted dark:text-text-secondary uppercase">Exams</p>
+                          <p className="font-heading font-black text-sm text-text-primary dark:text-text-primary mt-0.5">{stats.examCount}</p>
                         </div>
                       </div>
                     </GlassCard>
@@ -155,7 +159,8 @@ const Subjects: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  </AnimatedPage>
+);
 };
 
 export default Subjects;

@@ -3,6 +3,7 @@ import { useStudy } from '../context/StudyContext';
 import { useToast } from '../context/ToastContext';
 import Sidebar from '../components/layout/Sidebar';
 import GlassCard from '../components/ui/GlassCard';
+import AnimatedPage from '../components/layout/AnimatedPage';
 import { fetchStudyPlanFromGemini } from '../services/gemini';
 import { PlannerInput, Task } from '../types';
 import { ENV } from '../utils/env';
@@ -236,7 +237,8 @@ const AIPlanner: React.FC = () => {
   }, [totalGeneratedTasks, completedGeneratedTasks]);
 
   return (
-    <div className="min-h-screen bg-mesh text-slate-800 dark:text-slate-100 transition-colors duration-300">
+    <AnimatedPage>
+      <div className="min-h-screen bg-mesh text-text-primary dark:text-slate-100 transition-colors duration-300">
       {/* Hidden live region for screen-reader progress announcements */}
       <div className="sr-only" aria-live="polite">
         {ariaAnnounce}
@@ -246,15 +248,15 @@ const AIPlanner: React.FC = () => {
 
       <div className="md:pl-64 min-h-screen transition-all duration-300">
         {/* Switched from <main> to <div> since global landmark is in App.tsx */}
-        <div className="pt-20 md:pt-8 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+        <div className="pt-20 md:pt-8 p-6 md:p-8 max-w-7xl mx-auto space-y-8">
           
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-slate-900 dark:text-white">
+              <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-text-primary dark:text-text-primary">
                 AI Personalized Planner
               </h1>
-              <p className="text-slate-650 dark:text-slate-400 text-sm font-semibold">
+              <p className="text-slate-650 dark:text-text-muted text-sm font-semibold">
                 Define your courses and deadlines. Let Gemini structure a customized, day-by-day revision timeline.
               </p>
             </div>
@@ -269,8 +271,8 @@ const AIPlanner: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel border border-primary-500/10 text-xs font-bold text-primary-655 dark:text-primary-400 self-start shadow-sm">
-                <Sparkles className="w-4 h-4 text-primary-500" />
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl glass-panel border border-primary-500/10 text-xs font-bold text-brand-primary dark:text-brand-primary self-start shadow-sm">
+                <Sparkles className="w-4 h-4 text-brand-primary" />
                 <span>Gemini v2.5 Flash Engine</span>
               </div>
             )}
@@ -283,15 +285,15 @@ const AIPlanner: React.FC = () => {
             {/* Left Column: Constraints Input Form (1 column on desktop) */}
             <div className="space-y-6 lg:col-span-1">
               <GlassCard hover={false} className="p-6 space-y-6">
-                <div className="flex items-center gap-2 border-b border-slate-200/40 dark:border-slate-800/40 pb-4">
-                  <BookOpen className="w-5 h-5 text-primary-500" />
-                  <h2 className="font-heading font-extrabold text-lg text-slate-850 dark:text-white">Study Parameters</h2>
+                <div className="flex items-center gap-2 border-b border-border-primary/40 dark:border-border-primary/40 pb-4">
+                  <BookOpen className="w-5 h-5 text-brand-primary" />
+                  <h2 className="font-heading font-extrabold text-lg text-text-primary dark:text-text-primary">Study Parameters</h2>
                 </div>
 
                 {/* Form to Add Subject & Date */}
                 <form onSubmit={handleAddSubject} className="space-y-4">
                   <div>
-                    <label htmlFor="subject-input" className="block text-xs font-bold text-slate-650 dark:text-slate-400 uppercase mb-1">
+                    <label htmlFor="subject-input" className="block text-xs font-bold text-slate-650 dark:text-text-muted uppercase mb-1">
                       Add Course Subject
                     </label>
                     <input 
@@ -300,12 +302,12 @@ const AIPlanner: React.FC = () => {
                       value={newSubject}
                       onChange={(e) => setNewSubject(e.target.value)}
                       placeholder="e.g. Mathematics, Organic Chemistry"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-slate-900/20 text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:outline-none focus:bg-white dark:focus:bg-slate-950 transition-all text-slate-800 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 min-h-[44px]"
+                      className="w-full px-4 py-3 rounded-xl border border-border-primary dark:border-border-primary bg-surface-primary/20 dark:bg-surface-primary/20 text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:outline-none focus:bg-surface-primary dark:focus:bg-slate-950 transition-all text-text-primary dark:text-text-primary placeholder-slate-500 dark:placeholder-slate-400 min-h-[44px]"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="exam-date-input" className="block text-xs font-bold text-slate-655 dark:text-slate-400 uppercase mb-1">
+                    <label htmlFor="exam-date-input" className="block text-xs font-bold text-slate-655 dark:text-text-muted uppercase mb-1">
                       Exam Deadline Date
                     </label>
                     <input 
@@ -314,14 +316,14 @@ const AIPlanner: React.FC = () => {
                       value={newExamDate}
                       min={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setNewExamDate(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-slate-900/20 text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:outline-none focus:bg-white dark:focus:bg-slate-950 transition-all text-slate-800 dark:text-white min-h-[44px]"
+                      className="w-full px-4 py-3 rounded-xl border border-border-primary dark:border-border-primary bg-surface-primary/20 dark:bg-surface-primary/20 text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:outline-none focus:bg-surface-primary dark:focus:bg-slate-950 transition-all text-text-primary dark:text-text-primary min-h-[44px]"
                     />
                   </div>
 
                   <motion.button
                     type="submit"
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-slate-100 hover:bg-primary-50 dark:bg-slate-800/80 dark:hover:bg-primary-950/40 text-slate-700 hover:text-primary-655 dark:text-slate-350 dark:hover:text-primary-400 text-xs font-extrabold border border-slate-200/60 dark:border-slate-800 transition-all cursor-pointer min-h-[44px] focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                    className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-bg-primary hover:bg-primary-50 dark:bg-slate-800/80 dark:hover:bg-primary-950/40 text-text-secondary hover:text-brand-primary dark:text-slate-350 dark:hover:text-primary-400 text-xs font-extrabold border border-border-primary/60 dark:border-border-primary transition-all cursor-pointer min-h-[44px] focus:ring-2 focus:ring-primary-500 focus:outline-none"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add Subject</span>
@@ -330,16 +332,16 @@ const AIPlanner: React.FC = () => {
 
                 {/* Course Subjects Chip List */}
                 <div className="space-y-2">
-                  <span className="block text-xs font-bold text-slate-650 dark:text-slate-400 uppercase">
+                  <span className="block text-xs font-bold text-slate-650 dark:text-text-muted uppercase">
                     Configured Subjects ({subjects.length})
                   </span>
                   
                   {subjects.length === 0 ? (
                     // Premium Empty State for Configured Subjects
-                    <div className="text-center py-6 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800/80 bg-slate-100/10 dark:bg-slate-900/5">
-                      <BookOpen className="w-7 h-7 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
-                      <p className="text-xs font-bold text-slate-700 dark:text-slate-350">No courses added</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-450 mt-0.5 leading-normal">
+                    <div className="text-center py-6 px-4 rounded-2xl border border-dashed border-border-primary dark:border-border-primary/80 bg-bg-primary/10 dark:bg-surface-primary/5">
+                      <BookOpen className="w-7 h-7 text-text-muted dark:text-text-secondary mx-auto mb-2" />
+                      <p className="text-xs font-bold text-text-secondary dark:text-slate-350">No courses added</p>
+                      <p className="text-[10px] text-text-secondary dark:text-text-muted mt-0.5 leading-normal">
                         Type a subject and set its exam date above to build your revision targets list.
                       </p>
                     </div>
@@ -352,11 +354,11 @@ const AIPlanner: React.FC = () => {
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
-                            className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/50"
+                            className="flex items-center justify-between p-3 rounded-xl bg-surface-primary/40 dark:bg-surface-primary/40 border border-border-primary/50 dark:border-border-primary/50"
                           >
                             <div className="overflow-hidden">
-                              <p className="text-xs font-bold text-slate-850 dark:text-slate-200 truncate">{sub}</p>
-                              <p className="text-[10px] text-slate-600 dark:text-slate-450 flex items-center gap-1 mt-0.5 font-semibold">
+                              <p className="text-xs font-bold text-text-primary dark:text-slate-200 truncate">{sub}</p>
+                              <p className="text-[10px] text-text-secondary dark:text-text-muted flex items-center gap-1 mt-0.5 font-semibold">
                                 <Calendar className="w-3 h-3 text-pink-500" /> Exam: {examDates[sub] || 'N/A'}
                               </p>
                             </div>
@@ -377,10 +379,10 @@ const AIPlanner: React.FC = () => {
                 {/* Daily hours slider */}
                 <div className="space-y-3 pt-2">
                   <div className="flex items-center justify-between">
-                    <label htmlFor="daily-hours-slider" className="text-xs font-bold text-slate-655 dark:text-slate-400 uppercase">
+                    <label htmlFor="daily-hours-slider" className="text-xs font-bold text-slate-655 dark:text-text-muted uppercase">
                       Daily Study Availability
                     </label>
-                    <span className="text-xs font-extrabold text-primary-655 dark:text-primary-400 bg-primary-500/10 px-2 py-0.5 rounded-md">
+                    <span className="text-xs font-extrabold text-brand-primary dark:text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-md">
                       {dailyHours} Hours
                     </span>
                   </div>
@@ -392,9 +394,9 @@ const AIPlanner: React.FC = () => {
                     step="1"
                     value={dailyHours}
                     onChange={(e) => setDailyHours(Number(e.target.value))}
-                    className="w-full accent-primary-500 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
+                    className="w-full accent-primary-500 h-1.5 bg-bg-primary dark:bg-slate-800 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-600 dark:text-slate-450 font-bold">
+                  <div className="flex justify-between text-[10px] text-text-secondary dark:text-text-muted font-bold">
                     <span>1h</span>
                     <span>4h</span>
                     <span>8h</span>
@@ -403,12 +405,12 @@ const AIPlanner: React.FC = () => {
                 </div>
 
                 {/* API Action button */}
-                <div className="pt-4 border-t border-slate-200/40 dark:border-slate-800/40">
+                <div className="pt-4 border-t border-border-primary/40 dark:border-border-primary/40">
                   <motion.button
                     onClick={handleGeneratePlan}
                     disabled={loading}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-sm shadow-xl shadow-primary-500/25 hover:shadow-primary-500/35 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none cursor-pointer min-h-[48px] focus:ring-2 focus:ring-primary-500 focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-slate-950"
+                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-sm shadow-xl  hover: hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none cursor-pointer min-h-[48px] focus:ring-2 focus:ring-primary-500 focus:outline-none focus:ring-offset-2 dark:focus:ring-offset-slate-950"
                   >
                     <Sparkles className="w-4 h-4" />
                     <span>{studyPlan.length > 0 ? "Regenerate Study Plan" : "Generate Study Plan"}</span>
@@ -432,8 +434,8 @@ const AIPlanner: React.FC = () => {
               {loading ? (
                 <GlassCard hover={false} className="p-8 flex flex-col justify-center space-y-8 min-h-[450px]">
                   <div className="text-center space-y-2">
-                    <h3 className="font-heading font-black text-xl text-slate-900 dark:text-white">Formulating Revision Schedule...</h3>
-                    <p className="text-xs text-slate-550 dark:text-slate-450 font-semibold max-w-md mx-auto">
+                    <h3 className="font-heading font-black text-xl text-text-primary dark:text-text-primary">Formulating Revision Schedule...</h3>
+                    <p className="text-xs text-text-secondary dark:text-text-muted font-semibold max-w-md mx-auto">
                       Our system is running deep analytics to partition your curriculum based on upcoming exams.
                     </p>
                   </div>
@@ -443,17 +445,17 @@ const AIPlanner: React.FC = () => {
                     <div className="relative w-16 h-16 flex items-center justify-center">
                       <div className="absolute inset-0 rounded-full border-4 border-primary-500/25 animate-pulse" />
                       <div className="absolute inset-0 rounded-full border-4 border-t-primary-650 border-r-transparent border-b-transparent border-l-transparent animate-spin" />
-                      <Sparkles className="w-5 h-5 text-primary-500 animate-bounce" />
+                      <Sparkles className="w-5 h-5 text-brand-primary animate-bounce" />
                     </div>
                   </div>
 
                   {/* Horizontal Loading Status Bar */}
                   <div className="w-full max-w-md mx-auto space-y-2">
-                    <div className="flex justify-between text-[10px] font-bold text-primary-650 dark:text-primary-400 uppercase tracking-wide">
+                    <div className="flex justify-between text-[10px] font-bold text-primary-650 dark:text-brand-primary uppercase tracking-wide">
                       <span>Scheduler Pipeline Status</span>
                       <span>{Math.min(100, (loadingStage + 1) * 25)}%</span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-200/10">
+                    <div className="w-full bg-bg-primary dark:bg-slate-800 h-2 rounded-full overflow-hidden border border-border-primary/10">
                       <motion.div 
                         className="h-full bg-gradient-to-r from-primary-500 to-pink-500 rounded-full"
                         initial={{ width: 0 }}
@@ -474,10 +476,10 @@ const AIPlanner: React.FC = () => {
                           key={idx}
                           className={`flex items-start gap-4 p-3 rounded-xl border transition-colors ${
                             isActive 
-                              ? 'bg-primary-500/5 border-primary-500/25 shadow-sm'
+                              ? 'bg-brand-primary/5 border-primary-500/25 shadow-sm'
                               : isCompleted
                               ? 'bg-emerald-500/5 border-emerald-500/15 opacity-70'
-                              : 'bg-transparent border-slate-200/20 dark:border-slate-800/10 opacity-40'
+                              : 'bg-transparent border-border-primary/20 dark:border-border-primary/10 opacity-40'
                           }`}
                         >
                           <div className="shrink-0 mt-0.5">
@@ -486,7 +488,7 @@ const AIPlanner: React.FC = () => {
                                 <Check className="w-3.5 h-3.5 stroke-[3]" />
                               </div>
                             ) : isActive ? (
-                              <div className="w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center text-white animate-pulse">
+                              <div className="w-5 h-5 rounded-full bg-brand-primary flex items-center justify-center text-white animate-pulse">
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                               </div>
                             ) : (
@@ -495,11 +497,11 @@ const AIPlanner: React.FC = () => {
                           </div>
                           <div>
                             <p className={`text-xs font-black leading-tight ${
-                              isActive ? 'text-primary-655 dark:text-primary-400' : isCompleted ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'
+                              isActive ? 'text-brand-primary dark:text-brand-primary' : isCompleted ? 'text-text-primary dark:text-slate-200' : 'text-text-muted'
                             }`}>
                               {stage.title}
                             </p>
-                            <p className="text-[10px] text-slate-500 mt-0.5 font-semibold">
+                            <p className="text-[10px] text-text-secondary mt-0.5 font-semibold">
                               {stage.desc}
                             </p>
                           </div>
@@ -511,12 +513,12 @@ const AIPlanner: React.FC = () => {
               ) : studyPlan.length === 0 ? (
                 // Premium Empty State: No generated plan
                 <GlassCard hover={false} className="p-8 md:p-12 flex flex-col items-center justify-center text-center space-y-6 min-h-[450px] bg-gradient-to-tr from-slate-50/10 via-primary-500/5 to-transparent">
-                  <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-primary-500 to-indigo-650 text-white flex items-center justify-center shadow-xl shadow-primary-500/20">
+                  <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-primary-500 to-indigo-650 text-white flex items-center justify-center shadow-xl ">
                     <Calendar className="w-8 h-8" />
                   </div>
                   <div className="space-y-2.5 max-w-md">
-                    <h3 className="font-heading font-black text-xl md:text-2xl text-slate-900 dark:text-white leading-tight">AI Study Schedule Generator</h3>
-                    <p className="text-xs text-slate-655 dark:text-slate-400 font-semibold leading-relaxed">
+                    <h3 className="font-heading font-black text-xl md:text-2xl text-text-primary dark:text-text-primary leading-tight">AI Study Schedule Generator</h3>
+                    <p className="text-xs text-slate-655 dark:text-text-muted font-semibold leading-relaxed">
                       Transform course content and exam dates into a high-yield structured curriculum map. Click the button to automatically load standard parameters and review the schedule.
                     </p>
                   </div>
@@ -526,7 +528,7 @@ const AIPlanner: React.FC = () => {
                     <motion.button
                       onClick={handleGenerateSamplePlan}
                       whileTap={{ scale: 0.98 }}
-                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-extrabold text-xs shadow-lg shadow-primary-500/25 hover:-translate-y-0.5 transition-all cursor-pointer min-h-[44px]"
+                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary text-white font-extrabold text-xs shadow-lg  hover:-translate-y-0.5 transition-all cursor-pointer min-h-[44px]"
                     >
                       <Sparkles className="w-4 h-4 text-white" />
                       <span>Load Sample & Generate Plan</span>
@@ -539,12 +541,12 @@ const AIPlanner: React.FC = () => {
 
                   {/* Plan Metadata Widget */}
                   {studyPlanMetadata && (
-                    <GlassCard hover={false} className="p-4 flex flex-wrap items-center justify-between gap-4 border border-primary-500/10 bg-white/30 dark:bg-slate-900/30">
+                    <GlassCard hover={false} className="p-4 flex flex-wrap items-center justify-between gap-4 border border-primary-500/10 bg-surface-primary/30 dark:bg-surface-primary/30">
                       <div className="flex flex-wrap items-center gap-3">
                         {/* Generation Source Badge */}
                         <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black tracking-wide uppercase ${
                           studyPlanMetadata.generationSource === 'gemini' 
-                            ? 'bg-primary-500/10 text-primary-655 dark:text-primary-400 border border-primary-500/15'
+                            ? 'bg-brand-primary/10 text-brand-primary dark:text-brand-primary border border-primary-500/15'
                             : studyPlanMetadata.generationSource === 'cache'
                             ? 'bg-emerald-500/10 text-emerald-655 dark:text-emerald-400 border border-emerald-500/15'
                             : studyPlanMetadata.generationSource === 'demo'
@@ -554,7 +556,7 @@ const AIPlanner: React.FC = () => {
                           {studyPlanMetadata.generationSource === 'fallback' ? (
                             <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                           ) : (
-                            <Sparkles className="w-3.5 h-3.5 text-primary-500" />
+                            <Sparkles className="w-3.5 h-3.5 text-brand-primary" />
                           )}
                           {studyPlanMetadata.generationSource === 'gemini' && 'AI Generated'}
                           {studyPlanMetadata.generationSource === 'cache' && 'From Cache'}
@@ -574,13 +576,13 @@ const AIPlanner: React.FC = () => {
                         </span>
 
                         {/* Prompt Version Badge */}
-                        <span className="px-2.5 py-1.5 rounded-xl bg-slate-200/50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-800 text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400">
+                        <span className="px-2.5 py-1.5 rounded-xl bg-bg-primary/50 dark:bg-slate-800/80 border border-border-primary/60 dark:border-border-primary text-[10px] font-mono font-bold text-text-secondary dark:text-text-muted">
                           Prompt: {studyPlanMetadata.promptVersion}
                         </span>
                       </div>
 
                       {/* Timestamp */}
-                      <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-450">
+                      <span className="text-[10px] font-semibold text-text-secondary dark:text-text-muted">
                         Generated: {studyPlanMetadata.generatedAt}
                       </span>
                     </GlassCard>
@@ -588,15 +590,15 @@ const AIPlanner: React.FC = () => {
 
                   {/* AI Study Strategy Guide Card */}
                   {studyPlanMetadata && studyPlanMetadata.motivationalIntro && (
-                    <GlassCard hover={false} className="p-5 bg-gradient-to-tr from-pink-500/5 to-primary-500/5 border border-pink-500/10 text-xs font-semibold leading-relaxed text-slate-700 dark:text-slate-350">
-                      <p className="font-extrabold text-slate-855 dark:text-white mb-2 flex items-center gap-1.5">
-                        <Sparkles className="w-4 h-4 text-primary-500 animate-pulse" />
+                    <GlassCard hover={false} className="p-5 bg-gradient-to-tr from-pink-500/5 to-primary-500/5 border border-pink-500/10 text-xs font-semibold leading-relaxed text-text-secondary dark:text-slate-350">
+                      <p className="font-extrabold text-text-primary mb-2 flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-brand-primary animate-pulse" />
                         <span>AI Study Strategy Guide</span>
                       </p>
-                      <p className="italic text-slate-600 dark:text-slate-450 mb-3">"{studyPlanMetadata.motivationalIntro}"</p>
+                      <p className="italic text-text-secondary dark:text-text-muted mb-3">"{studyPlanMetadata.motivationalIntro}"</p>
                       {studyPlanMetadata.studyStrategy && (
-                        <div className="mt-3 pt-3 border-t border-slate-200/40 dark:border-slate-800/45 text-[11px] text-slate-655 dark:text-slate-400 leading-normal">
-                          <strong className="text-primary-600 dark:text-primary-400 uppercase tracking-wider text-[9px] block mb-1">Recommended Approach</strong>
+                        <div className="mt-3 pt-3 border-t border-border-primary/40 dark:border-border-primary/45 text-[11px] text-text-secondary dark:text-text-muted leading-normal">
+                          <strong className="text-brand-primary dark:text-brand-primary uppercase tracking-wider text-[9px] block mb-1">Recommended Approach</strong>
                           {studyPlanMetadata.studyStrategy}
                         </div>
                       )}
@@ -606,18 +608,18 @@ const AIPlanner: React.FC = () => {
                   {/* Progress Header Widget */}
                   <GlassCard hover={false} className="p-5 flex items-center justify-between bg-gradient-to-r from-primary-500/10 to-pink-500/10 border border-primary-500/10">
                     <div>
-                      <h3 className="font-heading font-black text-lg text-slate-850 dark:text-white">Plan Progress Tracker</h3>
-                      <p className="text-[10px] uppercase font-bold text-primary-600 dark:text-primary-400 mt-0.5">
+                      <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary">Plan Progress Tracker</h3>
+                      <p className="text-[10px] uppercase font-bold text-brand-primary dark:text-brand-primary mt-0.5">
                         {completedGeneratedTasks} of {totalGeneratedTasks} tasks completed ({completionPercent}%)
                       </p>
                     </div>
-                    <div className="w-14 h-14 rounded-full border-4 border-primary-500/20 flex items-center justify-center font-black text-xs text-primary-655 dark:text-primary-400 relative">
+                    <div className="w-14 h-14 rounded-full border-4 border-primary-500/20 flex items-center justify-center font-black text-xs text-brand-primary dark:text-brand-primary relative">
                       <svg className="w-full h-full transform -rotate-90 absolute inset-0">
                         <circle
                           cx="28"
                           cy="28"
                           r="24"
-                          className="stroke-current text-primary-500/10"
+                          className="stroke-current text-brand-primary/10"
                           strokeWidth="4"
                           fill="transparent"
                         />
@@ -625,7 +627,7 @@ const AIPlanner: React.FC = () => {
                           cx="28"
                           cy="28"
                           r="24"
-                          className="stroke-current text-primary-500"
+                          className="stroke-current text-brand-primary"
                           strokeWidth="4"
                           fill="transparent"
                           strokeDasharray={150.7}
@@ -647,12 +649,12 @@ const AIPlanner: React.FC = () => {
                           className={`p-6 border transition-all ${
                             dayComplete 
                               ? 'bg-emerald-500/5 border-emerald-500/20 opacity-75' 
-                              : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-slate-800/50'
+                              : 'bg-surface-primary/40 dark:bg-surface-primary/40 border-border-primary/50 dark:border-border-primary/50'
                           }`}
                         >
                           {/* Date header */}
-                          <div className="flex items-center justify-between border-b border-slate-200/30 dark:border-slate-850/30 pb-3 mb-4">
-                            <h3 className="font-heading font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                          <div className="flex items-center justify-between border-b border-border-primary/30 dark:border-border-primary/30 pb-3 mb-4">
+                            <h3 className="font-heading font-extrabold text-sm text-text-primary dark:text-text-primary flex items-center gap-2">
                               <Calendar className="w-4 h-4 text-pink-500" />
                               <span>{formatDate(day.date)}</span>
                             </h3>
@@ -670,8 +672,8 @@ const AIPlanner: React.FC = () => {
                                 key={task.id}
                                 className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${
                                   task.completed 
-                                    ? 'bg-slate-100/50 dark:bg-slate-950/20 border-slate-200/40 dark:border-slate-850/20 opacity-60' 
-                                    : 'bg-white/50 dark:bg-slate-950/30 border-slate-200/80 dark:border-slate-850/80 shadow-sm'
+                                    ? 'bg-bg-primary/50 dark:bg-bg-primary/20 border-border-primary/40 dark:border-border-primary/20 opacity-60' 
+                                    : 'bg-surface-primary/50 dark:bg-bg-primary/30 border-border-primary/80 dark:border-border-primary/80 shadow-sm'
                                 }`}
                               >
                                 <div className="flex items-center gap-3.5 overflow-hidden">
@@ -680,18 +682,18 @@ const AIPlanner: React.FC = () => {
                                     aria-label={`Toggle completion of ${task.title}`}
                                     className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all cursor-pointer shrink-0 min-h-[32px] min-w-[32px] focus:ring-2 focus:ring-primary-500 focus:outline-none ${
                                       task.completed 
-                                        ? 'bg-primary-500 border-primary-500 text-white' 
+                                        ? 'bg-brand-primary border-primary-500 text-white' 
                                         : 'border-slate-350 dark:border-slate-650 hover:border-primary-500 bg-transparent'
                                     }`}
                                   >
                                     {task.completed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                                   </button>
                                   <div className="overflow-hidden">
-                                    <p className={`text-xs font-bold truncate ${task.completed ? 'line-through text-slate-500 dark:text-slate-550' : 'text-slate-800 dark:text-slate-200'}`}>
+                                    <p className={`text-xs font-bold truncate ${task.completed ? 'line-through text-text-secondary dark:text-text-secondary' : 'text-text-primary dark:text-slate-200'}`}>
                                       {task.title}
                                     </p>
                                     <div className="flex items-center gap-2 mt-1.5">
-                                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-650 dark:bg-slate-850 dark:text-slate-400">
+                                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-bg-primary/80 text-slate-650 dark:bg-slate-850 dark:text-text-muted">
                                         {task.subject}
                                       </span>
                                       <span className={`text-[9px] font-bold ${
@@ -699,7 +701,7 @@ const AIPlanner: React.FC = () => {
                                       }`}>
                                         {task.priority} Priority
                                       </span>
-                                      <span className="text-[9px] font-semibold text-slate-450 dark:text-slate-500 flex items-center gap-0.5">
+                                      <span className="text-[9px] font-semibold text-text-muted dark:text-text-secondary flex items-center gap-0.5">
                                         <Clock className="w-3 h-3" /> {task.estimatedHours}h
                                       </span>
                                     </div>
@@ -708,7 +710,7 @@ const AIPlanner: React.FC = () => {
                                         {task.revisionBlocks.map((block: string, bIdx: number) => (
                                           <span 
                                             key={bIdx}
-                                            className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-primary-500/5 dark:bg-primary-500/10 text-primary-655 dark:text-primary-400 border border-primary-500/10"
+                                            className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-brand-primary/5 dark:bg-brand-primary/10 text-brand-primary dark:text-brand-primary border border-primary-500/10"
                                           >
                                             {block}
                                           </span>
@@ -733,7 +735,8 @@ const AIPlanner: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+  </AnimatedPage>
+);
 };
 
 export default AIPlanner;

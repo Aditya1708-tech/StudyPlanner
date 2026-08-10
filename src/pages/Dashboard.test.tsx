@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { StudyProvider } from '../context/StudyContext';
 import { ToastProvider } from '../context/ToastContext';
@@ -74,6 +74,8 @@ describe('Dashboard Component and Widget Tests', () => {
     
     await screen.findByRole('textbox', { name: 'Exam Name' });
     // Verify it is focused
-    expect(document.activeElement).toBe(nameInput);
+    await waitFor(() => {
+      expect(document.activeElement).toBe(nameInput);
+    });
   });
 });

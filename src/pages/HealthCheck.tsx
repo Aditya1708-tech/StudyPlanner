@@ -20,7 +20,7 @@ const HealthCheck: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white p-6">
-      <div className="max-w-xl w-full rounded-2xl border border-white/10 bg-white/5 p-6">
+      <div className="max-w-xl w-full rounded-2xl border border-white/10 bg-surface-primary/5 p-6">
         <h1 className="text-3xl font-bold mb-4 font-heading">Health Check</h1>
         <p className="text-slate-300 mb-4 text-sm font-semibold">
           This page verifies that the application can fetch external data.

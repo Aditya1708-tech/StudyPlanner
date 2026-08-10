@@ -117,25 +117,25 @@ const Tasks: React.FC = () => {
   }, [tasks, searchTerm, statusFilter, subjectFilter, priorityFilter]);
 
   return (
-    <div className="min-h-screen bg-mesh text-slate-800 dark:text-slate-100 transition-colors duration-300">
+    <div className="min-h-screen bg-mesh text-text-primary dark:text-slate-100 transition-colors duration-300">
       <Sidebar />
 
       <div className="md:pl-64 min-h-screen transition-all duration-300">
         {/* Switched from <main> to <div> since global landmark wraps routing shell */}
-        <div className="pt-20 md:pt-8 p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+        <div className="pt-20 md:pt-8 p-6 md:p-8 max-w-7xl mx-auto space-y-8">
           
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-slate-900 dark:text-white">Study Planner</h1>
-              <p className="text-slate-600 dark:text-slate-400 text-sm font-semibold">Organize coursework, manage estimated study hours, and schedule revisions.</p>
+              <h1 className="font-heading font-black text-3xl md:text-4xl tracking-tight text-text-primary dark:text-text-primary">Study Planner</h1>
+              <p className="text-text-secondary dark:text-text-muted text-sm font-semibold">Organize coursework, manage estimated study hours, and schedule revisions.</p>
             </div>
             
             <motion.button
               onClick={() => setShowForm(!showForm)}
               ref={toggleFormButtonRef}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-sm shadow-xl shadow-primary-500/20 hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all self-start cursor-pointer min-h-[44px] focus:ring-2 focus:ring-primary-500 focus:outline-none"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-sm shadow-xl  hover: hover:-translate-y-0.5 transition-all self-start cursor-pointer min-h-[44px] focus:ring-2 focus:ring-primary-500 focus:outline-none"
             >
               {showForm ? (
                 <>
@@ -162,10 +162,10 @@ const Tasks: React.FC = () => {
                 className="overflow-hidden"
               >
                 <GlassCard hover={false} className="border border-primary-500/20 p-6">
-                  <h3 className="font-heading font-black text-lg text-slate-850 dark:text-white mb-4">Create New Study Target</h3>
+                  <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-4">Create New Study Target</h3>
                   <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2">
-                      <label htmlFor="task-title" className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Task Title</label>
+                      <label htmlFor="task-title" className="text-[10px] font-bold text-text-secondary dark:text-text-muted uppercase tracking-wider">Task Title</label>
                       <input
                         id="task-title"
                         ref={taskTitleInputRef}
@@ -174,12 +174,12 @@ const Tasks: React.FC = () => {
                         placeholder="e.g. Review Organic Chemistry reaction mechanism sheets"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full mt-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-950 text-slate-800 dark:text-white min-h-[44px]"
+                        className="w-full mt-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-bg-primary/50 dark:bg-surface-primary/50 border border-border-primary dark:border-border-primary focus:outline-none focus:border-primary-500 focus:bg-surface-primary dark:focus:bg-slate-950 text-text-primary dark:text-text-primary min-h-[44px]"
                       />
                     </div>
                     
                     <div>
-                      <label htmlFor="task-subject" className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Subject / Course</label>
+                      <label htmlFor="task-subject" className="text-[10px] font-bold text-text-secondary dark:text-text-muted uppercase tracking-wider">Subject / Course</label>
                       <input
                         id="task-subject"
                         type="text"
@@ -187,17 +187,17 @@ const Tasks: React.FC = () => {
                         placeholder="e.g. Chemistry, Math, Literature"
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
-                        className="w-full mt-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-950 text-slate-800 dark:text-white min-h-[44px]"
+                        className="w-full mt-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-bg-primary/50 dark:bg-surface-primary/50 border border-border-primary dark:border-border-primary focus:outline-none focus:border-primary-500 focus:bg-surface-primary dark:focus:bg-slate-950 text-text-primary dark:text-text-primary min-h-[44px]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="task-priority" className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Priority Level</label>
+                      <label htmlFor="task-priority" className="text-[10px] font-bold text-text-secondary dark:text-text-muted uppercase tracking-wider">Priority Level</label>
                       <select
                         id="task-priority"
                         value={priority}
                         onChange={(e) => setPriority(e.target.value as 'High' | 'Medium' | 'Low')}
-                        className="w-full mt-1.5 px-3 py-2.5 text-sm font-semibold rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-950 text-slate-800 dark:text-white min-h-[44px]"
+                        className="w-full mt-1.5 px-3 py-2.5 text-sm font-semibold rounded-xl bg-bg-primary/50 dark:bg-surface-primary/50 border border-border-primary dark:border-border-primary focus:outline-none focus:border-primary-500 focus:bg-surface-primary dark:focus:bg-slate-950 text-text-primary dark:text-text-primary min-h-[44px]"
                       >
                         <option value="High">High Priority</option>
                         <option value="Medium">Medium Priority</option>
@@ -206,19 +206,19 @@ const Tasks: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="task-due" className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Due Date</label>
+                      <label htmlFor="task-due" className="text-[10px] font-bold text-text-secondary dark:text-text-muted uppercase tracking-wider">Due Date</label>
                       <input
                         id="task-due"
                         type="date"
                         required
                         value={dueDate}
                         onChange={(e) => setDueDate(e.target.value)}
-                        className="w-full mt-1.5 px-3.5 py-2.5 text-sm font-semibold rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-950 text-slate-855 dark:text-white min-h-[44px]"
+                        className="w-full mt-1.5 px-3.5 py-2.5 text-sm font-semibold rounded-xl bg-bg-primary/50 dark:bg-surface-primary/50 border border-border-primary dark:border-border-primary focus:outline-none focus:border-brand-primary focus:bg-surface-primary dark:focus:bg-surface-elevated text-text-primary min-h-[44px]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="task-hours" className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Estimated Workload (Hours)</label>
+                      <label htmlFor="task-hours" className="text-[10px] font-bold text-text-secondary dark:text-text-muted uppercase tracking-wider">Estimated Workload (Hours)</label>
                       <input
                         id="task-hours"
                         type="number"
@@ -228,7 +228,7 @@ const Tasks: React.FC = () => {
                         required
                         value={estimatedHours}
                         onChange={(e) => setEstimatedHours(e.target.value)}
-                        className="w-full mt-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-primary-500 focus:bg-white dark:focus:bg-slate-950 text-slate-800 dark:text-white min-h-[44px]"
+                        className="w-full mt-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl bg-bg-primary/50 dark:bg-surface-primary/50 border border-border-primary dark:border-border-primary focus:outline-none focus:border-primary-500 focus:bg-surface-primary dark:focus:bg-slate-950 text-text-primary dark:text-text-primary min-h-[44px]"
                       />
                     </div>
 
@@ -236,13 +236,13 @@ const Tasks: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setShowForm(false)}
-                        className="px-5 py-2.5 rounded-xl border border-slate-250 dark:border-slate-800 text-xs font-bold text-slate-655 hover:bg-slate-100 dark:text-slate-350 dark:hover:bg-slate-900 transition-colors cursor-pointer min-h-[44px]"
+                        className="px-5 py-2.5 rounded-xl border border-border-primary dark:border-border-primary text-xs font-bold text-slate-655 hover:bg-bg-primary dark:text-slate-350 dark:hover:bg-slate-900 transition-colors cursor-pointer min-h-[44px]"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-xs shadow-md shadow-primary-500/10 hover:-translate-y-0.5 transition-all cursor-pointer min-h-[44px]"
+                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold text-xs shadow-md  hover:-translate-y-0.5 transition-all cursor-pointer min-h-[44px]"
                       >
                         Save Task
                       </button>
@@ -257,7 +257,7 @@ const Tasks: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
             {/* Search */}
             <div className="relative md:col-span-2">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
               <label htmlFor="search-field" className="sr-only">Search tasks</label>
               <input
                 id="search-field"
@@ -265,19 +265,19 @@ const Tasks: React.FC = () => {
                 placeholder="Search tasks..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-xs font-semibold rounded-xl bg-white/40 dark:bg-slate-900/40 border border-slate-250 dark:border-slate-850/80 focus:outline-none focus:border-primary-500 text-slate-800 dark:text-white placeholder-slate-400 min-h-[40px]"
+                className="w-full pl-10 pr-4 py-2.5 text-xs font-semibold rounded-xl bg-surface-primary/40 dark:bg-surface-primary/40 border border-border-primary dark:border-border-primary/80 focus:outline-none focus:border-primary-500 text-text-primary dark:text-text-primary placeholder-slate-400 min-h-[40px]"
               />
             </div>
             
             {/* Subject Filter */}
             <div className="flex items-center gap-2">
-              <Filter className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+              <Filter className="w-3.5 h-3.5 text-text-secondary shrink-0" />
               <label htmlFor="filter-subject" className="sr-only">Filter by subject</label>
               <select
                 id="filter-subject"
                 value={subjectFilter}
                 onChange={(e) => setSubjectFilter(e.target.value)}
-                className="w-full py-2.5 px-3 text-xs font-semibold rounded-xl bg-white/40 dark:bg-slate-900/40 border border-slate-250 dark:border-slate-850/80 focus:outline-none focus:border-primary-500 text-slate-800 dark:text-white min-h-[40px]"
+                className="w-full py-2.5 px-3 text-xs font-semibold rounded-xl bg-surface-primary/40 dark:bg-surface-primary/40 border border-border-primary dark:border-border-primary/80 focus:outline-none focus:border-primary-500 text-text-primary dark:text-text-primary min-h-[40px]"
               >
                 <option value="All">All Subjects</option>
                 {availableSubjects.filter(sub => sub !== 'All').map(sub => (
@@ -293,7 +293,7 @@ const Tasks: React.FC = () => {
                 id="filter-priority"
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="w-full py-2.5 px-3 text-xs font-semibold rounded-xl bg-white/40 dark:bg-slate-900/40 border border-slate-250 dark:border-slate-850/80 focus:outline-none focus:border-primary-500 text-slate-800 dark:text-white min-h-[40px]"
+                className="w-full py-2.5 px-3 text-xs font-semibold rounded-xl bg-surface-primary/40 dark:bg-surface-primary/40 border border-border-primary dark:border-border-primary/80 focus:outline-none focus:border-primary-500 text-text-primary dark:text-text-primary min-h-[40px]"
               >
                 <option value="All">All Priorities</option>
                 <option value="High">High Priority</option>
@@ -304,15 +304,15 @@ const Tasks: React.FC = () => {
           </div>
 
           {/* Status Tabs */}
-          <div className="flex gap-2 border-b border-slate-250/20 dark:border-slate-800/40 pb-0.5">
+          <div className="flex gap-2 border-b border-border-primary/20 dark:border-border-primary/40 pb-0.5">
             {['All', 'Pending', 'Completed'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setStatusFilter(tab)}
                 className={`px-4 py-2 text-xs font-extrabold uppercase relative transition-colors cursor-pointer min-h-[36px] ${
                   statusFilter === tab 
-                    ? 'text-primary-655 dark:text-primary-400' 
-                    : 'text-slate-500 hover:text-slate-850 dark:hover:text-slate-200'
+                    ? 'text-brand-primary dark:text-brand-primary' 
+                    : 'text-text-secondary hover:text-text-primary dark:hover:text-slate-200'
                 }`}
               >
                 <span>{tab}</span>
@@ -333,7 +333,7 @@ const Tasks: React.FC = () => {
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-center py-12 text-slate-500 dark:text-slate-500 font-semibold"
+                  className="text-center py-12 text-text-secondary dark:text-text-secondary font-semibold"
                 >
                   No tasks matched your filters. Time to relax, or create another study task!
                 </motion.div>
@@ -351,8 +351,8 @@ const Tasks: React.FC = () => {
                       transition={{ duration: 0.3 }}
                       className={`flex flex-col sm:flex-row sm:items-center justify-between p-4.5 rounded-2xl border transition-all gap-4 ${
                         task.completed 
-                          ? 'bg-slate-100/40 dark:bg-slate-900/20 border-slate-200/50 dark:border-slate-800/10 opacity-60' 
-                          : 'bg-white/40 dark:bg-slate-900/40 border-slate-250/20 dark:border-slate-850/60 shadow-sm'
+                          ? 'bg-bg-primary/40 dark:bg-surface-primary/20 border-border-primary/50 dark:border-border-primary/10 opacity-60' 
+                          : 'bg-surface-primary/40 dark:bg-surface-primary/40 border-border-primary/20 dark:border-border-primary/60 shadow-sm'
                       }`}
                     >
                       {/* Checkbox and info */}
@@ -362,7 +362,7 @@ const Tasks: React.FC = () => {
                           aria-label={`Toggle completion of ${task.title}`}
                           className={`w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 transition-all cursor-pointer min-h-[32px] min-w-[32px] focus:ring-2 focus:ring-primary-500 focus:outline-none ${
                             task.completed 
-                              ? 'bg-primary-500 border-primary-500 text-white' 
+                              ? 'bg-brand-primary border-primary-500 text-white' 
                               : 'border-slate-350 dark:border-slate-650 hover:border-primary-500 bg-transparent'
                           }`}
                         >
@@ -371,13 +371,13 @@ const Tasks: React.FC = () => {
                         
                         <div className="space-y-1.5">
                           <h4 className={`font-semibold text-sm ${
-                            task.completed ? 'line-through text-slate-500 dark:text-slate-500 font-semibold' : 'text-slate-800 dark:text-slate-200'
+                            task.completed ? 'line-through text-text-secondary dark:text-text-secondary font-semibold' : 'text-text-primary dark:text-slate-200'
                           }`}>
                             {task.title}
                           </h4>
                           
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-150 text-slate-600 dark:bg-slate-800 dark:text-slate-450 border border-slate-200/20">
+                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-150 text-text-secondary dark:bg-slate-800 dark:text-text-muted border border-border-primary/20">
                               {task.subject}
                             </span>
                             
@@ -389,7 +389,7 @@ const Tasks: React.FC = () => {
                               {task.priority} Priority
                             </span>
 
-                            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-500 flex items-center gap-1">
+                            <span className="text-[10px] font-semibold text-text-secondary dark:text-text-secondary flex items-center gap-1">
                               <Clock className="w-3.5 h-3.5" />
                               <span>{task.estimatedHours}h study load</span>
                             </span>
@@ -400,9 +400,9 @@ const Tasks: React.FC = () => {
                       {/* Date and Delete */}
                       <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-4">
                         <div className="flex items-center gap-1.5">
-                          <Calendar className={`w-4.5 h-4.5 ${isOverdue ? 'text-rose-500' : 'text-slate-500'}`} />
+                          <Calendar className={`w-4.5 h-4.5 ${isOverdue ? 'text-rose-500' : 'text-text-secondary'}`} />
                           <span className={`text-xs font-bold ${
-                            isOverdue ? 'text-rose-500' : 'text-slate-600 dark:text-slate-400'
+                            isOverdue ? 'text-rose-500' : 'text-text-secondary dark:text-text-muted'
                           }`}>
                             {daysLeft}
                           </span>
@@ -412,7 +412,7 @@ const Tasks: React.FC = () => {
                         <button
                           onClick={() => deleteTask(task.id)}
                           aria-label={`Delete task: ${task.title}`}
-                          className="p-3 rounded-xl bg-slate-100 hover:bg-red-50 dark:bg-slate-800/50 dark:hover:bg-red-955/40 text-slate-500 hover:text-red-500 transition-colors cursor-pointer shadow-sm border border-slate-200/40 dark:border-slate-800/40 focus:ring-2 focus:ring-red-500 focus:outline-none min-h-[40px] flex items-center justify-center"
+                          className="p-3 rounded-xl bg-bg-primary hover:bg-red-50 dark:bg-slate-800/50 dark:hover:bg-red-955/40 text-text-secondary hover:text-red-500 transition-colors cursor-pointer shadow-sm border border-border-primary/40 dark:border-border-primary/40 focus:ring-2 focus:ring-red-500 focus:outline-none min-h-[40px] flex items-center justify-center"
                           title="Delete task"
                         >
                           <Trash2 className="w-4 h-4" />
