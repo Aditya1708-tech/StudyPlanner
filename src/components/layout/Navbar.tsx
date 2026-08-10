@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { useStudy } from '../../context/StudyContext';
 import { Sun, Moon, Sparkles, BookOpen } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useStudy();
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -29,13 +29,13 @@ const Navbar = () => {
       <div className="hidden md:flex items-center gap-8">
         <button 
           onClick={() => scrollToSection('features')} 
-          className="text-sm font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors"
+          className="text-sm font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors cursor-pointer"
         >
           Features
         </button>
         <button 
           onClick={() => scrollToSection('how-it-works')} 
-          className="text-sm font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors"
+          className="text-sm font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors cursor-pointer"
         >
           How It Works
         </button>
@@ -58,7 +58,7 @@ const Navbar = () => {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2.5 rounded-xl border border-slate-200/50 hover:bg-slate-100/50 dark:border-slate-800/40 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300 transition-all active:scale-95"
+          className="p-2.5 rounded-xl border border-slate-200/50 hover:bg-slate-100/50 dark:border-slate-800/40 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300 transition-all active:scale-95 cursor-pointer"
           aria-label="Toggle Theme"
         >
           {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-primary-600" />}

@@ -1,7 +1,16 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { HTMLMotionProps, motion } from 'framer-motion';
 
-const GlassCard = ({ 
+interface GlassCardProps extends HTMLMotionProps<'div'> {
+  children: React.ReactNode;
+  className?: string;
+  hover?: boolean;
+  heavy?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  delay?: number;
+}
+
+const GlassCard: React.FC<GlassCardProps> = ({ 
   children, 
   className = '', 
   hover = true, 

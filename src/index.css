@@ -150,3 +150,117 @@
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
 }
+
+/* Accessibility Skip Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, #d946ef 100%);
+  color: white;
+  padding: 10px 20px;
+  font-weight: 700;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4);
+  z-index: 999999;
+  transition: top 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #ffffff;
+  outline-offset: -4px;
+}
+
+/* Keyboard Focus Rings (WCAG AA Compliance) */
+*:focus-visible {
+  outline: 2.5px solid var(--color-primary-500) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25) !important;
+}
+
+.dark *:focus-visible {
+  outline: 2.5px solid var(--color-primary-400) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.25) !important;
+}
+
+/* Color Contrast Adjustments for Slate Text in Light Mode (reaches > 4.5:1 ratio) */
+.text-slate-400 {
+  color: #475569; /* slate-600 */
+}
+.text-slate-450 {
+  color: #334155; /* slate-700 */
+}
+.text-slate-500 {
+  color: #334155; /* slate-700 */
+}
+.text-slate-550 {
+  color: #1e293b; /* slate-800 */
+}
+.text-slate-600 {
+  color: #1e293b; /* slate-800 */
+}
+.text-slate-650 {
+  color: #0f172a; /* slate-900 */
+}
+.text-slate-655 {
+  color: #0f172a; /* slate-900 */
+}
+.text-slate-750 {
+  color: #0f172a; /* slate-900 */
+}
+
+/* Restore defaults for dark theme */
+.dark .text-slate-400 {
+  color: #94a3b8; /* slate-400 */
+}
+.dark .text-slate-450 {
+  color: #cbd5e1; /* slate-300 */
+}
+.dark .text-slate-500 {
+  color: #94a3b8; /* slate-400 */
+}
+.dark .text-slate-550 {
+  color: #cbd5e1; /* slate-300 */
+}
+.dark .text-slate-600 {
+  color: #cbd5e1; /* slate-300 */
+}
+.dark .text-slate-650 {
+  color: #cbd5e1; /* slate-300 */
+}
+.dark .text-slate-655 {
+  color: #e2e8f0; /* slate-200 */
+}
+.dark .text-slate-750 {
+  color: #e2e8f0; /* slate-200 */
+}
+
+/* Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+  
+  .animate-float,
+  .animate-spin,
+  .animate-pulse,
+  .animate-pulse-glow,
+  .animate-bounce {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+

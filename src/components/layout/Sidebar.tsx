@@ -10,15 +10,13 @@ import {
   Moon, 
   BookOpen, 
   Menu, 
-  X,
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  GraduationCap,
+  X, 
+  ChevronLeft, 
+  ChevronRight, 
   Activity
 } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar: React.FC = () => {
   const { theme, toggleTheme } = useStudy();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -26,11 +24,33 @@ const Sidebar = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'AI Planner', path: '/planner', icon: SparklesIcon },
     { name: 'AI Assistant', path: '/assistant', icon: MessageSquarePlus },
     { name: 'Tasks Planner', path: '/tasks', icon: CheckSquare },
     { name: 'Analytics', path: '/analytics', icon: BarChart3 },
     { name: 'Health Check', path: '/health', icon: Activity },
   ];
+
+  function SparklesIcon(props: React.SVGProps<SVGSVGElement>) {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+      >
+        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+        <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z" />
+        <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z" />
+      </svg>
+    );
+  }
 
   const handleMobileLinkClick = () => {
     setMobileOpen(false);
@@ -40,7 +60,7 @@ const Sidebar = () => {
     <>
       {/* Mobile Header */}
       <header className="md:hidden fixed top-0 left-0 right-0 h-16 glass-panel px-4 flex items-center justify-between z-40 border-b border-slate-200/50 dark:border-slate-800/40">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2" aria-label="StudyAI Planner Homepage">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary-600 to-pink-500 flex items-center justify-center text-white">
             <BookOpen className="w-4 h-4" />
           </div>
@@ -50,18 +70,19 @@ const Sidebar = () => {
         </Link>
         
         <div className="flex items-center gap-3">
-          {/* Quick Theme Toggle */}
+          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300"
-            aria-label="Toggle Theme"
+            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-350 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
+            aria-label="Toggle Dark/Light Theme"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-primary-600" />}
           </button>
           
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 text-slate-650 dark:text-slate-350"
+            aria-label="Open navigation menu"
+            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/50 text-slate-650 dark:text-slate-350 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -70,11 +91,12 @@ const Sidebar = () => {
 
       {/* Mobile Drawer Overlay */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
+        <div className="md:hidden fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-label="Mobile Navigation Drawer">
           {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
+            role="presentation"
           />
 
           {/* Drawer Panel */}
@@ -82,7 +104,7 @@ const Sidebar = () => {
             <div>
               {/* Logo / Title */}
               <div className="flex items-center justify-between mb-8">
-                <Link to="/" className="flex items-center gap-2">
+                <Link to="/" className="flex items-center gap-2" onClick={handleMobileLinkClick} aria-label="StudyAI Planner Homepage">
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-600 to-pink-500 flex items-center justify-center text-white">
                     <BookOpen className="w-4 h-4" />
                   </div>
@@ -92,14 +114,15 @@ const Sidebar = () => {
                 </Link>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                  aria-label="Close navigation menu"
+                  className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-850 text-slate-500 cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Links */}
-              <nav className="space-y-1.5">
+              <nav className="space-y-1.5" aria-label="Mobile Navigation Links">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
@@ -108,13 +131,13 @@ const Sidebar = () => {
                       key={item.path}
                       to={item.path}
                       onClick={handleMobileLinkClick}
-                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-sm transition-all ${
+                      className={`flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-sm transition-all min-h-[44px] ${
                         isActive
-                          ? 'bg-gradient-to-r from-primary-500/10 to-pink-500/5 border border-primary-500/20 text-primary-600 dark:text-primary-400'
+                          ? 'bg-gradient-to-r from-primary-500/10 to-pink-500/5 border border-primary-500/20 text-primary-655 dark:text-primary-400'
                           : 'text-slate-650 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/60'
                       }`}
                     >
-                      <Icon className={`w-5 h-5 ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-slate-500'}`} />
+                      <Icon className={`w-5 h-5 ${isActive ? 'text-primary-655 dark:text-primary-400' : 'text-slate-500'}`} />
                       <span>{item.name}</span>
                     </NavLink>
                   );
@@ -126,7 +149,8 @@ const Sidebar = () => {
             <div className="border-t border-slate-200/50 dark:border-slate-800/40 pt-4 space-y-4">
               <button
                 onClick={toggleTheme}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-650 dark:text-slate-350 text-sm font-semibold transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-650 dark:text-slate-350 text-sm font-semibold transition-colors cursor-pointer min-h-[44px]"
+                aria-label="Toggle theme color"
               >
                 {theme === 'dark' ? (
                   <>
@@ -142,7 +166,7 @@ const Sidebar = () => {
               </button>
 
               <div className="flex items-center gap-3 px-4">
-                <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-950 flex items-center justify-center text-primary-600 dark:text-primary-300 font-extrabold text-sm border border-primary-500/10">
+                <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-950 flex items-center justify-center text-primary-600 dark:text-primary-350 font-extrabold text-sm border border-primary-500/10">
                   AS
                 </div>
                 <div>
@@ -160,11 +184,12 @@ const Sidebar = () => {
         className={`hidden md:flex flex-col justify-between fixed top-0 left-0 bottom-0 z-30 h-screen border-r border-slate-200/40 dark:border-slate-800/40 glass-panel transition-all duration-300 ${
           collapsed ? 'w-20' : 'w-64'
         }`}
+        aria-label="Desktop Sidebar Navigation"
       >
         <div>
           {/* Header */}
           <div className={`flex items-center h-20 px-6 border-b border-slate-250/20 dark:border-slate-800/40 ${collapsed ? 'justify-center' : 'justify-between'}`}>
-            <Link to="/" className="flex items-center gap-2.5">
+            <Link to="/" className="flex items-center gap-2.5" aria-label="StudyAI Planner Homepage">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-primary-500/20 shrink-0">
                 <BookOpen className="w-4.5 h-4.5" />
               </div>
@@ -177,7 +202,7 @@ const Sidebar = () => {
           </div>
 
           {/* Nav Items */}
-          <nav className="p-4 space-y-1.5 mt-4">
+          <nav className="p-4 space-y-1.5 mt-4" aria-label="Sidebar Menu Links">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -185,14 +210,14 @@ const Sidebar = () => {
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-semibold text-sm transition-all group relative ${
+                  className={`flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-semibold text-sm transition-all group relative min-h-[44px] ${
                     isActive
-                      ? 'bg-gradient-to-r from-primary-500/10 to-pink-500/5 border border-primary-500/20 text-primary-600 dark:text-primary-400'
+                      ? 'bg-gradient-to-r from-primary-500/10 to-pink-500/5 border border-primary-500/20 text-primary-655 dark:text-primary-400'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 hover:bg-slate-100/50 dark:hover:text-white dark:hover:bg-slate-800/30'
                   } ${collapsed ? 'justify-center' : ''}`}
                 >
                   <Icon className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-105 ${
-                    isActive ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-350'
+                    isActive ? 'text-primary-655 dark:text-primary-400' : 'text-slate-400 group-hover:text-slate-650 dark:group-hover:text-slate-350'
                   }`} />
                   {!collapsed && <span>{item.name}</span>}
                   
@@ -213,7 +238,8 @@ const Sidebar = () => {
           {/* Collapse/Expand Toggle (Floater) */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex items-center justify-center w-full py-2 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 rounded-xl text-slate-500 dark:text-slate-400 transition-colors"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="hidden md:flex items-center justify-center w-full py-2.5 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 rounded-xl text-slate-500 dark:text-slate-400 transition-colors cursor-pointer min-h-[40px] focus:ring-2 focus:ring-primary-500 focus:outline-none"
           >
             {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
           </button>
@@ -221,7 +247,8 @@ const Sidebar = () => {
           {/* Theme Switcher */}
           <button
             onClick={toggleTheme}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-150/60 dark:hover:bg-slate-800/40 text-slate-650 dark:text-slate-350 text-sm font-semibold transition-colors ${collapsed ? 'justify-center' : ''}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-150/60 dark:hover:bg-slate-800/40 text-slate-655 dark:text-slate-350 text-sm font-semibold transition-colors cursor-pointer min-h-[44px] ${collapsed ? 'justify-center' : ''}`}
+            aria-label="Toggle theme color mode"
             title="Toggle theme"
           >
             {theme === 'dark' ? (
@@ -245,7 +272,7 @@ const Sidebar = () => {
             {!collapsed && (
               <div className="overflow-hidden">
                 <div className="font-semibold text-sm text-slate-800 dark:text-slate-100 truncate leading-tight">Aditya S.</div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate uppercase font-bold tracking-wider">Premium Student</div>
+                <div className="text-[10px] text-slate-550 dark:text-slate-400 truncate uppercase font-bold tracking-wider">Premium Student</div>
               </div>
             )}
           </div>

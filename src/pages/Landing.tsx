@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -8,29 +8,17 @@ import {
   CheckSquare, 
   BarChart3, 
   Calendar, 
-  Zap, 
-  ShieldCheck, 
-  Users, 
   BookOpen 
 } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
 import GlassCard from '../components/ui/GlassCard';
 
-const Landing = () => {
-  const containerVariants = {
+const Landing: React.FC = () => {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: { staggerChildren: 0.15 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: 'spring', stiffness: 100, damping: 15 }
     }
   };
 
@@ -89,9 +77,9 @@ const Landing = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full glass-panel border border-primary-500/20 text-primary-600 dark:text-primary-350 text-xs font-semibold mb-6 shadow-sm shadow-primary-500/5"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full glass-panel border border-primary-500/20 text-primary-655 dark:text-primary-350 text-xs font-semibold mb-6 shadow-sm shadow-primary-500/5 animate-pulse-glow"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <Sparkles className="w-3.5 h-3.5 text-primary-500" />
           <span>Supercharged Academic Planner with Generative AI</span>
         </motion.div>
 
@@ -99,17 +87,17 @@ const Landing = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-heading font-black text-4xl sm:text-5xl md:text-7xl tracking-tight max-w-4xl leading-[1.08] mb-6"
+          className="font-heading font-black text-4xl sm:text-5xl md:text-7xl tracking-tight max-w-4xl leading-[1.08] mb-6 text-slate-900 dark:text-white"
         >
           Plan smarter. <br />
-          Learn faster with <span className="text-gradient">AI Planner.</span>
+          Learn faster with <span className="text-gradient font-black">AI Planner.</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.3 }}
-          className="text-slate-600 dark:text-slate-350 text-base sm:text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-10"
+          className="text-slate-600 dark:text-slate-350 text-base sm:text-lg md:text-xl max-w-2xl font-semibold leading-relaxed mb-10"
         >
           The next-generation dashboard that schedules your tasks, helps you prep for upcoming exams, and answers complex queries instantly.
         </motion.p>
@@ -118,11 +106,11 @@ const Landing = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center gap-4 mb-20"
+          className="flex flex-col sm:flex-row items-center gap-4 mb-20 w-full sm:w-auto"
         >
           <Link
             to="/dashboard"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold shadow-xl shadow-primary-500/25 hover:shadow-primary-500/35 hover:-translate-y-0.5 transition-all duration-200 group active:scale-95 text-base"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-600 to-pink-500 text-white font-extrabold shadow-xl shadow-primary-500/25 hover:shadow-primary-500/35 hover:-translate-y-0.5 transition-all duration-200 group active:scale-95 text-base cursor-pointer"
           >
             <span>Start Planning Now</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -132,7 +120,7 @@ const Landing = () => {
               const el = document.getElementById('features');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-slate-900/30 hover:bg-white/50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-250 font-bold transition-all text-base active:scale-95"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-slate-900/30 hover:bg-white/50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-250 font-bold transition-all text-base active:scale-95 cursor-pointer"
           >
             Explore Features
           </button>
@@ -147,7 +135,7 @@ const Landing = () => {
         >
           <div className="rounded-2xl overflow-hidden glass-panel-heavy aspect-[16/9] border border-white/40 dark:border-white/10 relative flex flex-col">
             {/* Mock Dashboard Topbar */}
-            <div className="h-10 bg-slate-200/50 dark:bg-slate-950/50 flex items-center px-4 justify-between border-b border-slate-200/40 dark:border-slate-850/40">
+            <div className="h-10 bg-slate-255/50 dark:bg-slate-950/50 flex items-center px-4 justify-between border-b border-slate-200/40 dark:border-slate-850/40">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-400"></span>
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
@@ -215,7 +203,7 @@ const Landing = () => {
       <section id="features" className="py-20 md:py-28 px-6 bg-slate-100/30 dark:bg-dark-900/10 border-y border-slate-200/30 dark:border-slate-800/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-heading font-black text-3xl md:text-5xl tracking-tight mb-4">
+            <h2 className="font-heading font-black text-3xl md:text-5xl tracking-tight mb-4 text-slate-900 dark:text-white">
               Unlock your peak potential.
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-semibold">
@@ -234,12 +222,12 @@ const Landing = () => {
               const Icon = feat.icon;
               return (
                 <GlassCard key={idx} hover={true} className="flex gap-5 items-start p-8">
-                  <div className={`p-3.5 rounded-2xl bg-gradient-to-tr ${feat.color} text-white shadow-lg shadow-primary-500/10`}>
+                  <div className={`p-3.5 rounded-2xl bg-gradient-to-tr ${feat.color} text-white shadow-lg shadow-primary-500/10 shrink-0`}>
                     <Icon className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-heading font-bold text-xl text-slate-800 dark:text-white mb-2">{feat.title}</h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed font-medium">{feat.desc}</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed font-semibold">{feat.desc}</p>
                   </div>
                 </GlassCard>
               );
@@ -251,7 +239,7 @@ const Landing = () => {
       {/* How it Works Section */}
       <section id="how-it-works" className="py-20 md:py-28 px-6 max-w-6xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="font-heading font-black text-3xl md:text-5xl tracking-tight mb-4">
+          <h2 className="font-heading font-black text-3xl md:text-5xl tracking-tight mb-4 text-slate-900 dark:text-white">
             How it works
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-semibold">
@@ -276,7 +264,7 @@ const Landing = () => {
                 {step.num}
               </div>
               <h3 className="font-heading font-extrabold text-xl text-slate-800 dark:text-white mb-2">{step.title}</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed max-w-xs">{step.desc}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold leading-relaxed max-w-xs">{step.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -295,9 +283,9 @@ const Landing = () => {
           <div className="max-w-xl text-left space-y-4 relative z-10">
             <h2 className="font-heading font-black text-3xl md:text-5xl leading-tight">
               Ready to plan your <br />
-              <span className="text-gradient">next academic breakthrough?</span>
+              <span className="text-gradient font-black">next academic breakthrough?</span>
             </h2>
-            <p className="text-slate-350 text-base md:text-lg font-medium leading-relaxed">
+            <p className="text-slate-300 text-base md:text-lg font-semibold leading-relaxed">
               Create schedules, chat with our custom-built AI, track tasks, and monitor charts instantly. Completely free to study.
             </p>
           </div>
@@ -305,7 +293,7 @@ const Landing = () => {
           <div className="shrink-0 relative z-10 w-full md:w-auto">
             <Link
               to="/dashboard"
-              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4.5 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-base shadow-xl transition-all duration-200 active:scale-95"
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4.5 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-base shadow-xl transition-all duration-200 active:scale-95 cursor-pointer"
             >
               <span>Launch App Free</span>
               <Sparkles className="w-4.5 h-4.5 text-primary-600 animate-pulse" />
@@ -326,11 +314,11 @@ const Landing = () => {
             </span>
           </div>
 
-          <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">
+          <p className="text-slate-400 dark:text-slate-500 text-sm font-semibold">
             &copy; {new Date().getFullYear()} StudyAI Planner. Built for students who want to excel.
           </p>
 
-          <div className="flex items-center gap-6 text-slate-400 dark:text-slate-500 text-sm font-semibold">
+          <div className="flex items-center gap-6 text-slate-400 dark:text-slate-500 text-sm font-bold">
             <a href="#" className="hover:text-primary-500 transition-colors">Privacy</a>
             <a href="#" className="hover:text-primary-500 transition-colors">Terms</a>
             <a href="#" className="hover:text-primary-500 transition-colors">Contact</a>
