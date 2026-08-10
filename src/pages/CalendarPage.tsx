@@ -112,10 +112,10 @@ const CalendarPage: React.FC = () => {
                 
                 {/* Calendar Month Header */}
                 <div className="flex items-center justify-between border-b border-border-primary/40 dark:border-border-primary/40 pb-4 mb-6">
-                  <h3 className="font-heading font-black text-xl text-text-primary dark:text-text-primary flex items-center gap-2">
+                  <h2 className="font-heading font-black text-xl text-text-primary dark:text-text-primary flex items-center gap-2">
                     <CalendarIcon className="w-5.5 h-5.5 text-brand-primary" />
                     <span>{monthYearLabel}</span>
-                  </h3>
+                  </h2>
                   <div className="flex gap-2">
                     <button
                       onClick={handlePrevMonth}
@@ -157,6 +157,7 @@ const CalendarPage: React.FC = () => {
                       <button
                         key={day}
                         onClick={() => setSelectedDateStr(dateKey)}
+                        aria-label={`${day} ${monthYearLabel}`}
                         className={`aspect-square rounded-2xl border flex flex-col justify-between p-2.5 transition-all text-left group cursor-pointer focus:ring-2 focus:ring-primary-500 ${
                           isSelected 
                             ? 'bg-brand-primary border-primary-500 text-white shadow-lg ' 
@@ -217,7 +218,7 @@ const CalendarPage: React.FC = () => {
               <GlassCard hover={false} className="h-full flex flex-col justify-between p-6">
                 <div>
                   <div className="border-b border-border-primary/40 dark:border-border-primary/40 pb-4 mb-4">
-                    <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary">Agenda details</h3>
+                    <h2 className="font-heading font-black text-lg text-text-primary dark:text-text-primary">Agenda details</h2>
                     <p className="text-[10px] uppercase font-bold text-brand-primary tracking-wider">
                       {new Date(selectedDateStr).toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' })}
                     </p>
@@ -234,7 +235,7 @@ const CalendarPage: React.FC = () => {
                       {/* 1. Exams Scheduled */}
                       {selectedDayExams.length > 0 && (
                         <div className="space-y-2">
-                          <h4 className="text-[10px] font-bold uppercase text-rose-500 tracking-wider">Exams ({selectedDayExams.length})</h4>
+                          <h3 className="text-[10px] font-bold uppercase text-rose-500 tracking-wider">Exams ({selectedDayExams.length})</h3>
                           <div className="space-y-2">
                             {selectedDayExams.map(exam => (
                               <div key={exam.id} className="p-3.5 rounded-xl border border-rose-500/10 bg-rose-500/5 text-rose-900 dark:text-rose-200 space-y-1">
@@ -255,7 +256,7 @@ const CalendarPage: React.FC = () => {
                       {/* 2. Tasks Grid (Custom + AI Plan) */}
                       {(selectedDayCustomTasks.length > 0 || selectedDayRevisionTasks.length > 0) ? (
                         <div className="space-y-2">
-                          <h4 className="text-[10px] font-bold uppercase text-brand-primary tracking-wider">Tasks</h4>
+                          <h3 className="text-[10px] font-bold uppercase text-brand-primary tracking-wider">Tasks</h3>
                           <div className="space-y-2">
                             {/* Custom tasks */}
                             {selectedDayCustomTasks.map(task => (
@@ -308,7 +309,7 @@ const CalendarPage: React.FC = () => {
                       {/* 3. Study Sessions Logged */}
                       {selectedDaySessions.length > 0 && (
                         <div className="space-y-2">
-                          <h4 className="text-[10px] font-bold uppercase text-cyan-500 tracking-wider">Logged Study Time</h4>
+                          <h3 className="text-[10px] font-bold uppercase text-cyan-500 tracking-wider">Logged Study Time</h3>
                           <div className="space-y-2">
                             {selectedDaySessions.map(session => (
                               <div key={session.id} className="flex items-center justify-between p-3 rounded-xl border border-cyan-500/10 bg-cyan-500/5">

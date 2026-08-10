@@ -162,7 +162,7 @@ const Tasks: React.FC = () => {
                 className="overflow-hidden"
               >
                 <GlassCard hover={false} className="border border-primary-500/20 p-6">
-                  <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-4">Create New Study Target</h3>
+                  <h2 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-4">Create New Study Target</h2>
                   <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2">
                       <label htmlFor="task-title" className="text-[10px] font-bold text-text-secondary dark:text-text-muted uppercase tracking-wider">Task Title</label>
@@ -370,11 +370,11 @@ const Tasks: React.FC = () => {
                         </button>
                         
                         <div className="space-y-1.5">
-                          <h4 className={`font-semibold text-sm ${
+                          <h3 className={`font-semibold text-sm ${
                             task.completed ? 'line-through text-text-secondary dark:text-text-secondary font-semibold' : 'text-text-primary dark:text-slate-200'
                           }`}>
                             {task.title}
-                          </h4>
+                          </h3>
                           
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-150 text-text-secondary dark:bg-slate-800 dark:text-text-muted border border-border-primary/20">

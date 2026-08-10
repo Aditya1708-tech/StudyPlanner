@@ -394,7 +394,7 @@ export const fetchStudyPlanFromGemini = async (
   }
 
   const apiKey = ENV.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!apiKey || !apiKey.startsWith('AIzaSy')) {
     // Wait a brief simulated moment to make the interface loading state smooth
     await new Promise(resolve => setTimeout(resolve, 1500));
     

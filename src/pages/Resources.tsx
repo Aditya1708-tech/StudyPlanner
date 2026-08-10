@@ -128,10 +128,10 @@ const Resources: React.FC = () => {
               {/* Note creator widget */}
               <GlassCard hover={false} className="p-5 flex flex-col justify-between">
                 <div className="flex items-center justify-between border-b border-border-primary/40 dark:border-border-primary/40 pb-3 mb-4">
-                  <h3 className="font-heading font-black text-md text-text-primary dark:text-text-primary flex items-center gap-2">
+                  <h2 className="font-heading font-black text-md text-text-primary dark:text-text-primary flex items-center gap-2">
                     <Library className="w-5 h-5 text-brand-primary" />
                     <span>My Notes</span>
-                  </h3>
+                  </h2>
                   <button
                     onClick={handleCreateNote}
                     className="p-1.5 rounded-lg bg-bg-primary hover:bg-primary-50 dark:bg-slate-800 dark:hover:bg-primary-950 text-text-secondary hover:text-brand-primary transition-colors active:scale-95 cursor-pointer"
@@ -180,10 +180,10 @@ const Resources: React.FC = () => {
 
               {/* Guidelines Card */}
               <GlassCard hover={false} className="p-5 bg-gradient-to-tr from-primary-600/5 to-transparent border border-primary-500/10">
-                <h3 className="font-heading font-black text-md text-text-primary dark:text-text-primary flex items-center gap-2 mb-4">
+                <h2 className="font-heading font-black text-md text-text-primary dark:text-text-primary flex items-center gap-2 mb-4">
                   <Lightbulb className="w-5 h-5 text-amber-500 animate-pulse" />
                   <span>Strategic Study Tips</span>
-                </h3>
+                </h2>
                 <div className="space-y-4">
                   {studyGuides.map((guide, idx) => (
                     <div key={idx} className="space-y-1">
@@ -207,7 +207,9 @@ const Resources: React.FC = () => {
                   <div className="space-y-4 flex flex-col h-full">
                     {/* Note title & subject */}
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between border-b border-border-primary/40 dark:border-border-primary/40 pb-4">
+                      <label htmlFor="note-title-input" className="sr-only">Note Title</label>
                       <input
+                        id="note-title-input"
                         type="text"
                         placeholder="Note Title"
                         value={noteTitle}
@@ -215,7 +217,9 @@ const Resources: React.FC = () => {
                         className="font-heading font-black text-xl text-text-primary dark:text-text-primary bg-transparent border-none focus:outline-none placeholder-slate-400 w-full"
                       />
                       <div className="flex items-center gap-2 shrink-0">
+                        <label htmlFor="note-subject-select" className="sr-only">Note Subject</label>
                         <select
+                          id="note-subject-select"
                           value={noteSubject}
                           onChange={(e) => setNoteSubject(e.target.value)}
                           className="text-xs font-semibold px-2 py-1.5 rounded-lg bg-surface-primary/60 dark:bg-surface-primary border border-border-primary dark:border-border-primary focus:outline-none focus:ring-1 focus:ring-primary-500 text-text-primary dark:text-text-primary"
@@ -236,7 +240,9 @@ const Resources: React.FC = () => {
                     </div>
 
                     {/* Note content input */}
+                    <label htmlFor="note-content-textarea" className="sr-only">Note Content</label>
                     <textarea
+                      id="note-content-textarea"
                       placeholder="Start typing your study notes here..."
                       value={noteContent}
                       onChange={(e) => setNoteContent(e.target.value)}
@@ -246,7 +252,7 @@ const Resources: React.FC = () => {
                 ) : (
                   <div className="my-auto text-center py-20 text-text-muted dark:text-text-secondary">
                     <Sparkles className="w-12 h-12 text-brand-primary/20 mx-auto mb-3" />
-                    <h4 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-1">Select or Create a Note</h4>
+                    <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-1">Select or Create a Note</h3>
                     <p className="text-xs font-semibold text-text-secondary mb-4">Draft review guides and keep summaries in a single place.</p>
                     <button
                       onClick={handleCreateNote}

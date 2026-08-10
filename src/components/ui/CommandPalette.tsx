@@ -220,7 +220,9 @@ const CommandPalette: React.FC = () => {
             <div onKeyDown={handleKeyDownMenu}>
               <div className="flex items-center gap-3 px-4 border-b border-slate-200/40 dark:border-slate-800/40 h-14">
                 <Search className="w-5 h-5 text-slate-400 shrink-0" />
+                <label htmlFor="cmd-search-input" className="sr-only">Search commands</label>
                 <input
+                  id="cmd-search-input"
                   ref={inputRef}
                   type="text"
                   placeholder="Type a command to search..."
@@ -281,7 +283,7 @@ const CommandPalette: React.FC = () => {
           {view === 'add-task' && (
             <form onSubmit={handleCreateTaskSubmit} className="p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-3">
-                <h3 className="font-heading font-black text-sm text-slate-850 dark:text-white">Create Custom Task</h3>
+                <h2 className="font-heading font-black text-sm text-slate-850 dark:text-white">Create Custom Task</h2>
                 <button 
                   type="button" 
                   onClick={() => setView('menu')}
@@ -377,7 +379,7 @@ const CommandPalette: React.FC = () => {
           {view === 'add-exam' && (
             <form onSubmit={handleCreateExamSubmit} className="p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-3">
-                <h3 className="font-heading font-black text-sm text-slate-850 dark:text-white">Add Exam Countdown</h3>
+                <h2 className="font-heading font-black text-sm text-slate-850 dark:text-white">Add Exam Countdown</h2>
                 <button 
                   type="button" 
                   onClick={() => setView('menu')}
@@ -445,7 +447,7 @@ const CommandPalette: React.FC = () => {
           {view === 'log-session' && (
             <form onSubmit={handleLogSessionSubmit} className="p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-3">
-                <h3 className="font-heading font-black text-sm text-slate-850 dark:text-white">Log Study Session</h3>
+                <h2 className="font-heading font-black text-sm text-slate-850 dark:text-white">Log Study Session</h2>
                 <button 
                   type="button" 
                   onClick={() => setView('menu')}

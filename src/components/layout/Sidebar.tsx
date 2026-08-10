@@ -98,10 +98,11 @@ const Sidebar: React.FC = () => {
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-label="Mobile Navigation Drawer">
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+          <button 
+            type="button"
+            aria-label="Close menu"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm cursor-default w-full h-full border-none"
             onClick={() => setMobileOpen(false)}
-            role="presentation"
           />
 
           {/* Drawer Panel */}

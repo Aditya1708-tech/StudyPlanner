@@ -148,7 +148,7 @@ const Login: React.FC = () => {
                   className="space-y-6 text-left"
                 >
                   <div>
-                    <h2 className="font-heading font-black text-3xl sm:text-4xl text-text-primary dark:text-text-primary leading-tight">Welcome back</h2>
+                    <h1 className="font-heading font-black text-3xl sm:text-4xl text-text-primary dark:text-text-primary leading-tight">Welcome back</h1>
                     <p className="text-xs text-text-secondary font-semibold mt-1.5">Sign in to resume your study plans and streak schedules.</p>
                   </div>
 
@@ -209,8 +209,9 @@ const Login: React.FC = () => {
 
                     {/* Remember me row */}
                     <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2 text-xs font-semibold text-text-secondary dark:text-text-muted cursor-pointer select-none">
+                      <label htmlFor="remember-me-checkbox" className="flex items-center gap-2 text-xs font-semibold text-text-secondary dark:text-text-muted cursor-pointer select-none">
                         <input 
+                          id="remember-me-checkbox"
                           type="checkbox"
                           checked={rememberMe}
                           onChange={(e) => setRememberMe(e.target.checked)}
@@ -280,7 +281,7 @@ const Login: React.FC = () => {
                   </button>
 
                   <div>
-                    <h2 className="font-heading font-black text-3xl text-text-primary dark:text-text-primary">Reset password</h2>
+                    <h1 className="font-heading font-black text-3xl text-text-primary dark:text-text-primary">Reset password</h1>
                     <p className="text-xs text-text-secondary font-semibold mt-1.5">Enter your email and we'll send a password recovery link.</p>
                   </div>
 
@@ -348,7 +349,7 @@ const Login: React.FC = () => {
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-brand-primary text-white flex items-center justify-center shadow-lg"><Sparkles className="w-4.5 h-4.5" /></div>
                 <div>
-                  <h4 className="font-heading font-black text-xs text-white leading-none">AI Study operating system</h4>
+                  <div className="font-heading font-black text-xs text-white leading-none">AI Study operating system</div>
                   <span className="text-[7.5px] uppercase font-bold text-primary-400">Gemini Planner Pro</span>
                 </div>
               </div>
@@ -374,7 +375,7 @@ const Login: React.FC = () => {
           </motion.div>
 
           <div className="space-y-2.5 max-w-xs relative z-10 text-white">
-            <h3 className="font-heading font-black text-xl">Ace your semesters proactively.</h3>
+            <h2 className="font-heading font-black text-xl">Ace your semesters proactively.</h2>
             <p className="text-xs text-text-muted font-semibold leading-relaxed">
               Plan weeks in advance, run offline timers, get structural AI revision guides, and stay consistent.
             </p>

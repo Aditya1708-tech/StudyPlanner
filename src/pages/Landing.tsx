@@ -236,14 +236,14 @@ const Landing: React.FC = () => {
               </motion.div>
 
               {/* Editorial Title */}
-              <motion.div
+              <motion.h1
                 variants={staggerItem}
                 className="space-y-2 font-heading font-black text-5xl sm:text-6xl tracking-tight leading-[1.05] text-text-primary"
               >
-                <h2>Study smarter.</h2>
-                <h2>Stay consistent.</h2>
-                <h2 className="text-gradient">Ace every exam.</h2>
-              </motion.div>
+                <span className="block">Study smarter.</span>
+                <span className="block">Stay consistent.</span>
+                <span className="block text-gradient">Ace every exam.</span>
+              </motion.h1>
 
               {/* Subtext */}
               <motion.p
@@ -352,7 +352,7 @@ const Landing: React.FC = () => {
                   25:00
                 </div>
                 <div className="text-left">
-                  <h4 className="text-[10px] font-black text-text-primary uppercase tracking-wider">Focus Timer</h4>
+                  <div className="text-[10px] font-black text-text-primary uppercase tracking-wider">Focus Timer</div>
                   <span className="text-[9px] text-text-secondary font-semibold">Active Session</span>
                 </div>
               </motion.div>
@@ -366,7 +366,7 @@ const Landing: React.FC = () => {
                   <Flame className="w-5.5 h-5.5 fill-orange-500" />
                 </div>
                 <div className="text-left">
-                  <h4 className="text-[10px] font-black text-text-primary uppercase tracking-wider">Active Streak</h4>
+                  <div className="text-[10px] font-black text-text-primary uppercase tracking-wider">Active Streak</div>
                   <span className="text-[9px] text-orange-500 font-extrabold">🔥 7 Days Active</span>
                 </div>
               </motion.div>
@@ -445,34 +445,34 @@ const Landing: React.FC = () => {
                         {/* Metric 1 */}
                         <div className="p-3.5 rounded-xl border border-border-primary bg-bg-primary text-left space-y-1">
                           <span className="text-[8px] font-black text-text-muted uppercase tracking-wider block">Today's Tasks</span>
-                          <h4 className="text-xs font-heading font-black text-text-primary leading-none mt-1">
+                          <div className="text-xs font-heading font-black text-text-primary leading-none mt-1">
                             {simStep >= 5 ? "0 / 2" : "2 Pending"}
-                          </h4>
+                          </div>
                         </div>
 
                         {/* Metric 2 */}
                         <div className="p-3.5 rounded-xl border border-border-primary bg-bg-primary text-left space-y-1">
                           <span className="text-[8px] font-black text-text-muted uppercase tracking-wider block">Study Time</span>
-                          <h4 className="text-xs font-heading font-black text-text-primary leading-none mt-1">
+                          <div className="text-xs font-heading font-black text-text-primary leading-none mt-1">
                             {simStep >= 5 ? "3.5 h" : "0.0 h"}
-                          </h4>
+                          </div>
                         </div>
 
                         {/* Metric 3 */}
                         <div className="p-3.5 rounded-xl border border-border-primary bg-bg-primary text-left space-y-1">
                           <span className="text-[8px] font-black text-text-muted uppercase tracking-wider block">Streak</span>
-                          <h4 className="text-xs font-heading font-black text-orange-500 flex items-center gap-0.5 leading-none mt-1">
+                          <div className="text-xs font-heading font-black text-orange-500 flex items-center gap-0.5 leading-none mt-1">
                             <span>7 Days</span>
                             <Flame className="w-3 h-3 text-orange-500 fill-orange-500" />
-                          </h4>
+                          </div>
                         </div>
 
                         {/* Metric 4 */}
                         <div className="p-3.5 rounded-xl border border-border-primary bg-bg-primary text-left space-y-1">
                           <span className="text-[8px] font-black text-text-muted uppercase tracking-wider block">Next Exam</span>
-                          <h4 className="text-xs font-heading font-black text-brand-secondary truncate leading-none mt-1">
+                          <div className="text-xs font-heading font-black text-brand-secondary truncate leading-none mt-1">
                             {simStep >= 3 ? "Chemistry" : "None"}
-                          </h4>
+                          </div>
                         </div>
 
                       </div>
@@ -745,7 +745,7 @@ const Landing: React.FC = () => {
               <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5 space-y-3 text-left">
                 <div className="flex items-center gap-2 text-red-500">
                   <XCircle className="w-5 h-5 shrink-0" />
-                  <h4 className="font-bold text-xs">Reactive Cramming</h4>
+                  <h3 className="font-bold text-xs">Reactive Cramming</h3>
                 </div>
                 <ul className="text-[10px] text-text-secondary font-semibold space-y-2 list-disc list-inside">
                   <li>Panicked midnight revision sessions</li>
@@ -758,7 +758,7 @@ const Landing: React.FC = () => {
               <div className="p-6 rounded-2xl border border-brand-success/20 bg-brand-success/5 space-y-3 text-left">
                 <div className="flex items-center gap-2 text-brand-success">
                   <CheckCircle2 className="w-5 h-5 shrink-0" />
-                  <h4 className="font-bold text-xs">Proactive Planning</h4>
+                  <h3 className="font-bold text-xs">Proactive Planning</h3>
                 </div>
                 <ul className="text-[10px] text-text-secondary font-semibold space-y-2 list-disc list-inside">
                   <li>Structured daily workload schedules</li>
@@ -839,7 +839,7 @@ const Landing: React.FC = () => {
                     {test.author[0]}
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-xs text-text-primary">{test.author}</h4>
+                    <h3 className="font-extrabold text-xs text-text-primary">{test.author}</h3>
                     <p className="text-[9px] text-text-muted font-bold">{test.major}</p>
                   </div>
                 </div>

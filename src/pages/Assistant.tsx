@@ -268,7 +268,9 @@ const Assistant: React.FC = () => {
 
                 {/* Bottom Input Area */}
                 <form onSubmit={handleSubmit} className="mt-4 pt-3 border-t border-border-primary/40 dark:border-border-primary/40 flex items-center gap-3">
+                  <label htmlFor="assistant-chat-input" className="sr-only">Ask study question</label>
                   <input
+                    id="assistant-chat-input"
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}

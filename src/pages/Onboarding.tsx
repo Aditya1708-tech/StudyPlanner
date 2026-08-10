@@ -227,7 +227,7 @@ const Onboarding: React.FC = () => {
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Step 01 of 03</span>
                     </span>
-                    <h2 className="font-heading font-black text-2xl sm:text-3xl">What subjects are we studying?</h2>
+                    <h1 className="font-heading font-black text-2xl sm:text-3xl">What subjects are we studying?</h1>
                     <p className="text-xs text-text-secondary font-semibold leading-relaxed">
                       Add the courses, classes, or modules you are taking this semester. Our AI builds specific study guides around them.
                     </p>
@@ -236,7 +236,9 @@ const Onboarding: React.FC = () => {
                   {/* Input subject form */}
                   <div className="space-y-3">
                     <div className="relative">
+                      <label htmlFor="onboarding-subject-input" className="sr-only">Subject Name</label>
                       <input
+                        id="onboarding-subject-input"
                         type="text"
                         placeholder="e.g. Mathematics"
                         value={subjectInput}
@@ -308,7 +310,7 @@ const Onboarding: React.FC = () => {
                       <CalendarIcon className="w-3.5 h-3.5" />
                       <span>Step 02 of 03</span>
                     </span>
-                    <h2 className="font-heading font-black text-2xl sm:text-3xl">Any upcoming exams?</h2>
+                    <h1 className="font-heading font-black text-2xl sm:text-3xl">Any upcoming exams?</h1>
                     <p className="text-xs text-text-secondary font-semibold leading-relaxed">
                       Enter key exam deadlines. The AI schedule planner distributes workloads to review course subjects prior to these dates.
                     </p>
@@ -319,8 +321,9 @@ const Onboarding: React.FC = () => {
                     
                     {/* Exam Name */}
                     <div className="sm:col-span-6 space-y-1">
-                      <label className="text-[8px] font-black uppercase text-text-muted tracking-wider">Exam Name</label>
+                      <label htmlFor="exam-name-input" className="text-[8px] font-black uppercase text-text-muted tracking-wider">Exam Name</label>
                       <input
+                        id="exam-name-input"
                         type="text"
                         placeholder="e.g. Midterm 1"
                         required
@@ -332,8 +335,9 @@ const Onboarding: React.FC = () => {
 
                     {/* Subject Select */}
                     <div className="sm:col-span-6 space-y-1">
-                      <label className="text-[8px] font-black uppercase text-text-muted tracking-wider">Course Subject</label>
+                      <label htmlFor="exam-subject-select" className="text-[8px] font-black uppercase text-text-muted tracking-wider">Course Subject</label>
                       <select
+                        id="exam-subject-select"
                         required
                         value={examSubject}
                         onChange={(e) => setExamSubject(e.target.value)}
@@ -348,8 +352,9 @@ const Onboarding: React.FC = () => {
 
                     {/* Date Picker */}
                     <div className="sm:col-span-8 space-y-1">
-                      <label className="text-[8px] font-black uppercase text-text-muted tracking-wider">Exam Date</label>
+                      <label htmlFor="exam-date-input" className="text-[8px] font-black uppercase text-text-muted tracking-wider">Exam Date</label>
                       <input
+                        id="exam-date-input"
                         type="date"
                         required
                         value={examDate}
@@ -384,7 +389,7 @@ const Onboarding: React.FC = () => {
                             className="flex justify-between items-center p-3 bg-bg-primary border border-border-primary rounded-xl"
                           >
                             <div>
-                              <h4 className="text-xs font-bold text-text-primary">{ex.name}</h4>
+                              <h3 className="text-xs font-bold text-text-primary">{ex.name}</h3>
                               <p className="text-[9.5px] font-bold text-text-muted">Subject: {ex.subject} | Date: {ex.date}</p>
                             </div>
                             <button 
@@ -415,7 +420,7 @@ const Onboarding: React.FC = () => {
                       <Clock className="w-3.5 h-3.5" />
                       <span>Step 03 of 03</span>
                     </span>
-                    <h2 className="font-heading font-black text-2xl sm:text-3xl">Set daily availability</h2>
+                    <h1 className="font-heading font-black text-2xl sm:text-3xl">Set daily availability</h1>
                     <p className="text-xs text-text-secondary font-semibold leading-relaxed">
                       How many hours can you commit to studying every day? We'll distribute revision tasks evenly to meet your workload targets.
                     </p>
@@ -424,11 +429,12 @@ const Onboarding: React.FC = () => {
                   {/* Range Slider */}
                   <div className="space-y-5 py-6">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-black uppercase text-text-muted">Daily Availability</span>
+                      <label htmlFor="daily-availability-input" className="text-xs font-black uppercase text-text-muted">Daily Availability</label>
                       <span className="text-2xl font-heading font-black text-brand-primary">{dailyHours} Hours / day</span>
                     </div>
 
                     <input 
+                      id="daily-availability-input"
                       type="range"
                       min={1}
                       max={8}

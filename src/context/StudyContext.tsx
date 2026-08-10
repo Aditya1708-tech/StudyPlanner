@@ -81,7 +81,10 @@ const getCuratedTasks = (): Task[] => [
 
 const getCuratedExams = (): Exam[] => [
   { id: 'curated-exam-1', name: 'Chemistry Midterm', subject: 'Chemistry', date: getRelativeDateStr(4), location: 'Science Hall 301' },
-  { id: 'curated-exam-2', name: 'Calculus Final', subject: 'Calculus III', date: getRelativeDateStr(12), location: 'Math Tower Rm 102' }
+  { id: 'curated-exam-2', name: 'Calculus Final', subject: 'Calculus III', date: getRelativeDateStr(12), location: 'Math Tower Rm 102' },
+  { id: 'curated-exam-3', name: 'Physics Exam', subject: 'Physics II', date: getRelativeDateStr(6), location: 'Physics Bldg Rm 204' },
+  { id: 'curated-exam-4', name: 'Linear Algebra Quiz', subject: 'Linear Algebra', date: getRelativeDateStr(8), location: 'Math Tower Rm 104' },
+  { id: 'curated-exam-5', name: 'Organic Chemistry Test', subject: 'Organic Chemistry', date: getRelativeDateStr(10), location: 'Chemistry Lab 12' }
 ];
 
 const getCuratedMessages = (): ChatMessage[] => [
@@ -104,7 +107,10 @@ const getCuratedPlannerInput = (): PlannerInput => ({
   subjects: ['Chemistry', 'Calculus III', 'Physics II', 'Linear Algebra', 'Organic Chemistry'],
   examDates: {
     'Chemistry': getRelativeDateStr(4),
-    'Calculus III': getRelativeDateStr(12)
+    'Calculus III': getRelativeDateStr(12),
+    'Physics II': getRelativeDateStr(6),
+    'Linear Algebra': getRelativeDateStr(8),
+    'Organic Chemistry': getRelativeDateStr(10)
   },
   dailyHours: 4
 });

@@ -92,10 +92,10 @@ const FloatingTimer: React.FC = () => {
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-200/40 dark:border-slate-850/40 pb-3">
-              <h3 className="font-heading font-black text-sm flex items-center gap-1.5">
+              <h2 className="font-heading font-black text-sm flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-primary-500" />
                 <span>Focus Session</span>
-              </h3>
+              </h2>
               <button 
                 onClick={() => setIsOpen(false)}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"

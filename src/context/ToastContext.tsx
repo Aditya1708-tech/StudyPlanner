@@ -48,6 +48,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       {/* Toast Portal Container */}
       <div 
         className="fixed top-4 right-4 z-[99999] flex flex-col gap-3 w-[90%] max-w-sm pointer-events-none"
+        role="region"
         aria-label="Notifications"
       >
         <AnimatePresence>

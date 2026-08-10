@@ -468,10 +468,10 @@ const Dashboard: React.FC = () => {
           {showOnboarding && (
             <GlassCard hover={false} className="border border-brand-primary/20 bg-gradient-to-tr from-brand-primary/5 to-transparent p-6 space-y-5">
               <div>
-                <h3 className="font-heading font-black text-lg text-text-primary flex items-center gap-2">
+                <h2 className="font-heading font-black text-lg text-text-primary flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-brand-primary" />
                   <span>Welcome to StudyAI Planner Pro!</span>
-                </h3>
+                </h2>
                 <p className="text-xs text-text-secondary dark:text-text-muted font-semibold mt-1">Let's set up your personalized scheduler in three quick steps:</p>
               </div>
 
@@ -489,13 +489,15 @@ const Dashboard: React.FC = () => {
                     }`}>
                       {hasSubjects ? '✓' : '1'}
                     </span>
-                    <h4 className="font-bold text-xs text-text-primary">Add Academic Subjects</h4>
+                    <h3 className="font-bold text-xs text-text-primary">Add Academic Subjects</h3>
                   </div>
                   <p className="text-[10px] text-text-secondary font-semibold mb-3">Configure subjects you are enrolled in.</p>
                   
                   {!hasSubjects ? (
                     <form onSubmit={handleAddSubjectOnboarding} className="flex gap-1.5">
+                      <label htmlFor="onboarding-subject-input" className="sr-only">Onboarding Subject Name</label>
                       <input
+                        id="onboarding-subject-input"
                         type="text"
                         required
                         placeholder="e.g. Calculus"
@@ -524,7 +526,7 @@ const Dashboard: React.FC = () => {
                     }`}>
                       {hasExams ? '✓' : '2'}
                     </span>
-                    <h4 className="font-bold text-xs text-text-primary">Add Exams Countdown</h4>
+                    <h3 className="font-bold text-xs text-text-primary">Add Exams Countdown</h3>
                   </div>
                   <p className="text-[10px] text-text-secondary font-semibold mb-3">Log milestone exam dates for calculation.</p>
                   
@@ -552,7 +554,7 @@ const Dashboard: React.FC = () => {
                     }`}>
                       {hasPlan ? '✓' : '3'}
                     </span>
-                    <h4 className="font-bold text-xs text-text-primary">Generate AI Study Plan</h4>
+                    <h3 className="font-bold text-xs text-text-primary">Generate AI Study Plan</h3>
                   </div>
                   <p className="text-[10px] text-text-secondary font-semibold mb-3">Run optimization models to structure sessions.</p>
                   
@@ -701,7 +703,7 @@ const Dashboard: React.FC = () => {
                     {todayAllTasks.length === 0 && todayLoggedSessions.length === 0 ? (
                       <div className="text-center py-10 px-4 text-text-secondary border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10">
                         <CheckCircle2 className="w-8 h-8 text-brand-primary mx-auto mb-3 opacity-60" />
-                        <h4 className="font-heading font-black text-sm text-text-primary">All Tasks Completed!</h4>
+                        <h3 className="font-heading font-black text-sm text-text-primary">All Tasks Completed!</h3>
                         <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">Your agenda is fully clear. Generate an AI study plan or add a custom task.</p>
                       </div>
                     ) : (
@@ -823,7 +825,7 @@ const Dashboard: React.FC = () => {
                     {todayAllTasks.length === 0 ? (
                       <div className="text-center py-10 px-4 text-text-secondary border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10">
                         <CheckSquare className="w-8 h-8 text-brand-primary mx-auto mb-3 opacity-60" />
-                        <h4 className="font-heading font-black text-sm text-text-primary">Clear Schedule</h4>
+                        <h3 className="font-heading font-black text-sm text-text-primary">Clear Schedule</h3>
                         <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">All study task countdowns have been processed successfully.</p>
                       </div>
                     ) : (
@@ -911,10 +913,10 @@ const Dashboard: React.FC = () => {
               {/* Study Insights Chart (7D, 30D, 90D tabs) */}
               <GlassCard hover={false} className="p-6 space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border-primary/40 pb-4 gap-4">
-                  <h3 className="font-heading font-black text-lg text-text-primary flex items-center gap-2">
+                  <h2 className="font-heading font-black text-lg text-text-primary flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-brand-primary" />
                     <span>Study Insights</span>
-                  </h3>
+                  </h2>
                   
                   {/* Tabs */}
                   <div className="flex rounded-lg bg-bg-primary p-1 self-start">
@@ -939,7 +941,7 @@ const Dashboard: React.FC = () => {
                   {studySessions.length === 0 ? (
                     <div className="h-56 flex flex-col items-center justify-center text-text-secondary dark:text-text-muted border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10 px-4 text-center">
                       <Clock className="w-8 h-8 text-brand-primary mb-3 opacity-60" />
-                      <h4 className="font-heading font-black text-sm text-text-primary font-bold">No Study Data Yet</h4>
+                      <h3 className="font-heading font-black text-sm text-text-primary font-bold">No Study Data Yet</h3>
                       <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">Track dynamic focus sessions to populate interactive chart metrics.</p>
                     </div>
                   ) : (
@@ -990,7 +992,7 @@ const Dashboard: React.FC = () => {
                       <Sparkles className="w-5 h-5 animate-pulse" />
                     </div>
                     <div>
-                      <h3 className="font-heading font-extrabold text-lg text-text-primary">AI assistant</h3>
+                      <h2 className="font-heading font-extrabold text-lg text-text-primary">AI assistant</h2>
                       <p className="text-[10px] uppercase font-bold text-brand-primary">Study Strategy Recommendation</p>
                     </div>
                   </div>
@@ -1021,15 +1023,15 @@ const Dashboard: React.FC = () => {
               {isLoading ? renderCalendarSkeleton() : (
                 <GlassCard hover={false} className="p-5 space-y-4">
                   <div className="flex items-center justify-between border-b border-border-primary/40 pb-3">
-                    <h3 className="font-heading font-black text-sm text-text-primary flex items-center gap-1.5">
+                    <h2 className="font-heading font-black text-sm text-text-primary flex items-center gap-1.5">
                       <CalendarIcon className="w-4.5 h-4.5 text-brand-primary" />
                       <span>Study Calendar</span>
-                    </h3>
+                    </h2>
                     <div className="flex gap-1">
-                      <button onClick={handlePrevMonth} className="p-1 rounded bg-bg-primary text-text-secondary cursor-pointer">
+                      <button onClick={handlePrevMonth} aria-label="Previous month" className="p-1 rounded bg-bg-primary text-text-secondary cursor-pointer">
                         <ChevronLeft className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={handleNextMonth} className="p-1 rounded bg-bg-primary text-text-secondary cursor-pointer">
+                      <button onClick={handleNextMonth} aria-label="Next month" className="p-1 rounded bg-bg-primary text-text-secondary cursor-pointer">
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -1056,6 +1058,7 @@ const Dashboard: React.FC = () => {
                         <button
                           key={day}
                           onClick={() => setSelectedCalendarDateStr(dateKey)}
+                          aria-label={`${day} ${calendarMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}`}
                           className={`aspect-square rounded-lg flex flex-col items-center justify-center p-0.5 relative cursor-pointer text-[10px] font-bold border transition-colors ${
                             isSelected 
                               ? 'bg-brand-primary border-brand-primary text-white shadow' 
@@ -1124,10 +1127,10 @@ const Dashboard: React.FC = () => {
               {/* Upcoming Exams Milestone Tracker */}
               <GlassCard hover={false} className="p-5 space-y-4">
                 <div className="flex items-center justify-between border-b border-border-primary/40 pb-3">
-                  <h3 className="font-heading font-black text-sm text-text-primary flex items-center gap-1.5">
+                  <h2 className="font-heading font-black text-sm text-text-primary flex items-center gap-1.5">
                     <CalendarIcon className="w-4.5 h-4.5 text-brand-primary" />
                     <span>Upcoming Exams</span>
-                  </h3>
+                  </h2>
                   
                   <button 
                     ref={addExamButtonRef}
@@ -1199,7 +1202,7 @@ const Dashboard: React.FC = () => {
                   {exams.length === 0 ? (
                     <div className="text-center py-6 px-4 text-text-secondary border border-dashed border-border-primary/60 rounded-2xl bg-surface-primary/10">
                       <CalendarIcon className="w-8 h-8 text-brand-primary mx-auto mb-3 opacity-60" />
-                      <h4 className="font-heading font-black text-sm text-text-primary">No Exams Added</h4>
+                      <h3 className="font-heading font-black text-sm text-text-primary">No Exams Added</h3>
                       <p className="text-[10px] text-text-muted mt-1 max-w-xs mx-auto">Add upcoming exams to map out prioritization countdown schedules.</p>
                     </div>
                   ) : (
@@ -1213,7 +1216,7 @@ const Dashboard: React.FC = () => {
                             <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 bg-brand-primary/10 text-brand-primary rounded">
                               {exam.subject}
                             </span>
-                            <h4 className="font-bold text-xs text-text-primary mt-1">{exam.name}</h4>
+                            <h3 className="font-bold text-xs text-text-primary mt-1">{exam.name}</h3>
                             <p className="text-[9px] font-semibold text-text-muted">{exam.date}</p>
                           </div>
                           

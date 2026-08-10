@@ -517,7 +517,7 @@ const AIPlanner: React.FC = () => {
                     <Calendar className="w-8 h-8" />
                   </div>
                   <div className="space-y-2.5 max-w-md">
-                    <h3 className="font-heading font-black text-xl md:text-2xl text-text-primary dark:text-text-primary leading-tight">AI Study Schedule Generator</h3>
+                    <h2 className="font-heading font-black text-xl md:text-2xl text-text-primary dark:text-text-primary leading-tight">AI Study Schedule Generator</h2>
                     <p className="text-xs text-slate-655 dark:text-text-muted font-semibold leading-relaxed">
                       Transform course content and exam dates into a high-yield structured curriculum map. Click the button to automatically load standard parameters and review the schedule.
                     </p>
@@ -608,7 +608,7 @@ const AIPlanner: React.FC = () => {
                   {/* Progress Header Widget */}
                   <GlassCard hover={false} className="p-5 flex items-center justify-between bg-gradient-to-r from-primary-500/10 to-pink-500/10 border border-primary-500/10">
                     <div>
-                      <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary">Plan Progress Tracker</h3>
+                      <h2 className="font-heading font-black text-lg text-text-primary dark:text-text-primary">Plan Progress Tracker</h2>
                       <p className="text-[10px] uppercase font-bold text-brand-primary dark:text-brand-primary mt-0.5">
                         {completedGeneratedTasks} of {totalGeneratedTasks} tasks completed ({completionPercent}%)
                       </p>

@@ -113,7 +113,7 @@ const Register: React.FC = () => {
                   <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/5 animate-bounce">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <h2 className="font-heading font-black text-2xl">Registration Success</h2>
+                  <h1 className="font-heading font-black text-2xl">Registration Success</h1>
                   <p className="text-xs text-text-secondary font-semibold">Creating your profile and launching onboarding pipeline...</p>
                 </motion.div>
               ) : (
@@ -133,7 +133,7 @@ const Register: React.FC = () => {
                   </Link>
 
                   <div>
-                    <h2 className="font-heading font-black text-3xl sm:text-4xl text-text-primary dark:text-text-primary leading-tight">Create Account</h2>
+                    <h1 className="font-heading font-black text-3xl sm:text-4xl text-text-primary dark:text-text-primary leading-tight">Create Account</h1>
                     <p className="text-xs text-text-secondary font-semibold mt-1.5">Sign up to structure schedules and optimize your study hours free.</p>
                   </div>
 
@@ -286,7 +286,7 @@ const Register: React.FC = () => {
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-brand-primary text-white flex items-center justify-center shadow-lg"><Sparkles className="w-4.5 h-4.5" /></div>
                 <div>
-                  <h4 className="font-heading font-black text-xs text-white leading-none">AI Study operating system</h4>
+                  <div className="font-heading font-black text-xs text-white leading-none">AI Study operating system</div>
                   <span className="text-[7.5px] uppercase font-bold text-primary-400">Gemini Planner Pro</span>
                 </div>
               </div>
@@ -312,7 +312,7 @@ const Register: React.FC = () => {
           </motion.div>
 
           <div className="space-y-2.5 max-w-xs relative z-10 text-white">
-            <h3 className="font-heading font-black text-xl">Ace your semesters proactively.</h3>
+            <h2 className="font-heading font-black text-xl">Ace your semesters proactively.</h2>
             <p className="text-xs text-text-muted font-semibold leading-relaxed">
               Plan weeks in advance, run offline timers, get structural AI revision guides, and stay consistent.
             </p>

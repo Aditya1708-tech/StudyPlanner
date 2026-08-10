@@ -1,22 +1,31 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('StudyAI Planner Pro E2E Flow', () => {
+  test.afterEach(async ({ page }, testInfo) => {
+    if (testInfo.status !== testInfo.expectedStatus) {
+      await page.screenshot({ path: `C:/Users/admin/.gemini/antigravity-ide/brain/a8976c58-b775-4178-8c17-cc620a36babe/screenshot-failure.png`, fullPage: true });
+    }
+  });
+
   test('should allow a user to open landing, enter app, configure and generate a study plan, and complete a task', async ({ page }) => {
+    page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+    page.on('pageerror', err => console.log('BROWSER ERROR:', err.message));
+    
     // 1. Open Landing Page
     await page.goto('/');
     
     // Check that landing page title renders
-    await expect(page.locator('h1')).toContainText('Plan smarter');
+    await expect(page.locator('h1')).toContainText('Study smarter');
 
     // 2. Click CTA to enter App / Dashboard
-    await page.click('text=Start Planning Now');
+    await page.click('text=Try Demo');
     
     // Wait for Dashboard to render
     await page.waitForURL('/dashboard');
     await expect(page.locator('h1')).toContainText('Aditya');
 
     // 3. Navigate to AI Planner
-    await page.click('text=Launch AI Planner');
+    await page.click('text=AI Planner');
     await page.waitForURL('/planner');
     await expect(page.locator('h1')).toContainText('AI Personalized Planner');
 

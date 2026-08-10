@@ -74,12 +74,14 @@ const Subjects: React.FC = () => {
 
             {/* Add Subject form */}
           <GlassCard hover={false} className="max-w-md">
-            <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-4 flex items-center gap-2">
+            <h2 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-4 flex items-center gap-2">
               <Plus className="w-5 h-5 text-brand-primary" />
               <span>Add New Subject</span>
-            </h3>
+            </h2>
             <form onSubmit={handleAddSubject} className="flex gap-2">
+              <label htmlFor="new-subject-input" className="sr-only">New Subject Name</label>
               <input
+                id="new-subject-input"
                 type="text"
                 required
                 placeholder="e.g. Chemistry, Calculus, World History"
@@ -109,7 +111,7 @@ const Subjects: React.FC = () => {
                 <div className="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center text-brand-primary border border-primary-500/20 mx-auto mb-4">
                   <BookOpen className="w-8 h-8" />
                 </div>
-                <h4 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-1">No subjects configured</h4>
+                <h3 className="font-heading font-black text-lg text-text-primary dark:text-text-primary mb-1">No subjects configured</h3>
                 <p className="text-xs text-text-secondary dark:text-text-muted font-semibold mb-4">Add your first academic subject above to start organizing your study center.</p>
               </div>
             ) : (
@@ -121,7 +123,7 @@ const Subjects: React.FC = () => {
                       {/* Delete button (absolute) */}
                       <button
                         onClick={() => deleteSubject(subject)}
-                        aria-label={`Delete ${subject}`}
+                        aria-label={`Delete subject ${subject}`}
                         className="absolute top-4 right-4 p-2 rounded-lg bg-bg-primary hover:bg-red-50 dark:bg-slate-800/60 dark:hover:bg-red-950/30 text-text-muted hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer focus:opacity-100"
                       >
                         <Trash2 className="w-4 h-4" />
