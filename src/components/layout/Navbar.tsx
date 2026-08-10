@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-6xl z-50 rounded-2xl glass-panel px-6 py-4 flex items-center justify-between transition-colors duration-300">
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-6xl z-50 rounded-full glass-panel px-6 py-2.5 flex items-center justify-between transition-colors duration-300 border border-slate-200/50 dark:border-slate-800/40">
       {/* Logo */}
       <Link to="/" className="flex items-center gap-2 group">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-primary-500/20 group-hover:rotate-6 transition-transform">
