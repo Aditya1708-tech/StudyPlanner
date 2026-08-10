@@ -41,7 +41,7 @@ describe('Sidebar Component Tests', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('AI Planner')).toBeInTheDocument();
     expect(screen.getByText('AI Assistant')).toBeInTheDocument();
-    expect(screen.getByText('Tasks Planner')).toBeInTheDocument();
+    expect(screen.getByText('My Tasks')).toBeInTheDocument();
     expect(screen.getByText('Analytics')).toBeInTheDocument();
 
     // Verify collapse trigger is present and click it

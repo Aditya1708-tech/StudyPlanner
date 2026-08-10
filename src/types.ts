@@ -8,6 +8,15 @@ export interface Task {
   completed: boolean;
   isGenerated?: boolean;
   revisionBlocks?: string[];
+  completedAt?: string;
+}
+
+export interface StudySession {
+  id: string;
+  subject: string;
+  durationMinutes: number;
+  date: string; // YYYY-MM-DD
+  timestamp: string; // ISO String
 }
 
 export interface Exam {

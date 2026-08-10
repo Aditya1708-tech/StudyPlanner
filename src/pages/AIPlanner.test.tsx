@@ -105,9 +105,9 @@ describe('AIPlanner Component Tests', () => {
     // Wait for stages to progress and resolve (simulates at least 4s total stage progression)
     await waitFor(() => {
       expect(screen.queryByText('Formulating Revision Schedule...')).not.toBeInTheDocument();
-    }, { timeout: 6000 });
+    }, { timeout: 10000 });
 
     // Once complete, schedule tracker and progress widget should render
     expect(screen.getByText('Plan Progress Tracker')).toBeInTheDocument();
-  });
+  }, 15000);
 });

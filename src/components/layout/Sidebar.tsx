@@ -13,7 +13,9 @@ import {
   X, 
   ChevronLeft, 
   ChevronRight, 
-  Activity
+  Activity,
+  Calendar,
+  Library
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -25,10 +27,13 @@ const Sidebar: React.FC = () => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'AI Planner', path: '/planner', icon: SparklesIcon },
+    { name: 'My Tasks', path: '/tasks', icon: CheckSquare },
     { name: 'AI Assistant', path: '/assistant', icon: MessageSquarePlus },
-    { name: 'Tasks Planner', path: '/tasks', icon: CheckSquare },
+    { name: 'Subjects', path: '/subjects', icon: BookOpen },
     { name: 'Analytics', path: '/analytics', icon: BarChart3 },
+    { name: 'Calendar', path: '/calendar', icon: Calendar },
     { name: 'Health Check', path: '/health', icon: Activity },
+    { name: 'Resources', path: '/resources', icon: Library }
   ];
 
   function SparklesIcon(props: React.SVGProps<SVGSVGElement>) {

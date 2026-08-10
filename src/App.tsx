@@ -11,11 +11,16 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import AIPlanner from './pages/AIPlanner';
 import Tasks from './pages/Tasks';
+import CommandPalette from './components/ui/CommandPalette';
+import FloatingTimer from './components/ui/FloatingTimer';
 
 // Explicitly lazy load non-critical routes for code splitting and package size optimization
 const Assistant = lazy(() => import('./pages/Assistant'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const HealthCheck = lazy(() => import('./pages/HealthCheck'));
+const Subjects = lazy(() => import('./pages/Subjects'));
+const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+const Resources = lazy(() => import('./pages/Resources'));
 
 // Screen-reader accessible loading fallback
 const PageLoader: React.FC = () => (
@@ -38,6 +43,8 @@ function App() {
         <StudyProvider>
           <OfflineBanner />
           <Router>
+            <CommandPalette />
+            <FloatingTimer />
             {/* Skip-to-content link for keyboard / screen-reader accessibility */}
             <a href="#main-content" className="skip-link">
               Skip to Content
@@ -57,6 +64,9 @@ function App() {
                   <Route path="/tasks" element={<Tasks />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/health" element={<HealthCheck />} />
+                  <Route path="/subjects" element={<Subjects />} />
+                  <Route path="/calendar" element={<CalendarPage />} />
+                  <Route path="/resources" element={<Resources />} />
                   {/* Fallback route */}
                   <Route path="*" element={<Landing />} />
                 </Routes>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { Task, Exam, ChatMessage, PlannerInput, StudyDay, StudyPlanMetadata } from '../types';
+import { Task, Exam, ChatMessage, PlannerInput, StudyDay, StudyPlanMetadata, StudySession } from '../types';
 import { useToast } from './ToastContext';
 import { getSimpleHash, SeededRandom } from '../utils/random';
 
@@ -23,6 +23,15 @@ interface StudyContextType {
   completionPercentage: number;
   totalStudyHoursThisWeek: string;
   
+  // Dynamic metrics additions
+  studySessions: StudySession[];
+  addStudySession: (session: Omit<StudySession, 'id' | 'timestamp'>) => void;
+  streakCount: number;
+  overallProgress: number;
+  currentDateStr: string;
+  addSubject: (subject: string) => void;
+  deleteSubject: (subject: string) => void;
+
   // AI Planner additions
   plannerInput: PlannerInput;
   savePlannerInput: (input: PlannerInput) => void;
@@ -43,30 +52,16 @@ export const useStudy = () => {
   return context;
 };
 
-const defaultTasks: Task[] = [
-  { id: '1', title: 'Review Chemistry Chapter 4 (Organic Synthesis)', subject: 'Chemistry', dueDate: new Date().toISOString().split('T')[0], priority: 'High', estimatedHours: 2, completed: false },
-  { id: '2', title: 'Solve Calculus III Practice Set 5', subject: 'Mathematics', dueDate: new Date(Date.now() + 86400000).toISOString().split('T')[0], priority: 'Medium', estimatedHours: 3, completed: false },
-  { id: '3', title: 'Draft Biology Lab Report on Photosynthesis', subject: 'Biology', dueDate: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0], priority: 'Low', estimatedHours: 1.5, completed: false },
-  { id: '4', title: 'Outline Physics Term Project Architecture', subject: 'Physics', dueDate: new Date(Date.now() + 86400000 * 4).toISOString().split('T')[0], priority: 'High', estimatedHours: 4, completed: true }
-];
-
-const defaultExams: Exam[] = [
-  { id: '1', subject: 'Chemistry', date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0], name: 'Chemistry Midterm Exam', location: 'Hall A' },
-  { id: '2', subject: 'Mathematics', date: new Date(Date.now() + 86400000 * 6).toISOString().split('T')[0], name: 'Calculus Final Assessment', location: 'Seminar Room B' },
-  { id: '3', subject: 'Physics', date: new Date(Date.now() + 86400000 * 10).toISOString().split('T')[0], name: 'Advanced Physics Term Quiz', location: 'Lab Room 102' }
-];
+const defaultTasks: Task[] = [];
+const defaultExams: Exam[] = [];
 
 const defaultMessages: ChatMessage[] = [
-  { id: 'msg-1', sender: 'ai', text: "Hello! I am your StudyAI assistant. I can analyze your study tasks, create structured review plans, explain complex topics, or generate new tasks directly for your calendar. What subject are we tackling today?", timestamp: new Date(Date.now() - 600000).toISOString() }
+  { id: 'msg-1', sender: 'ai', text: "Hello! I am your StudyAI assistant. I can analyze your study tasks, create structured review plans, explain complex topics, or generate new tasks directly for your calendar. What subject are we tackling today?", timestamp: new Date().toISOString() }
 ];
 
 const defaultPlannerInput: PlannerInput = {
-  subjects: ['Chemistry', 'Mathematics', 'Physics'],
-  examDates: {
-    'Chemistry': new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
-    'Mathematics': new Date(Date.now() + 86400000 * 6).toISOString().split('T')[0],
-    'Physics': new Date(Date.now() + 86400000 * 10).toISOString().split('T')[0]
-  },
+  subjects: [],
+  examDates: {},
   dailyHours: 4
 };
 
@@ -98,16 +93,11 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return saved ? JSON.parse(saved) : defaultMessages;
   });
 
-  // Active study hours historical log (for analytics charts)
-  const [studyHistory, setStudyHistory] = useState<{ day: string; hours: number }[]>([
-    { day: 'Mon', hours: 4.5 },
-    { day: 'Tue', hours: 3.0 },
-    { day: 'Wed', hours: 5.5 },
-    { day: 'Thu', hours: 6.0 },
-    { day: 'Fri', hours: 4.0 },
-    { day: 'Sat', hours: 2.5 },
-    { day: 'Sun', hours: 0 }
-  ]);
+  // Study sessions state
+  const [studySessions, setStudySessions] = useState<StudySession[]>(() => {
+    const saved = localStorage.getItem('study_sessions');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   // AI Study Planner input
   const [plannerInput, setPlannerInput] = useState<PlannerInput>(() => {
@@ -158,15 +148,48 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('planner_input', JSON.stringify(plannerInput));
   }, [plannerInput]);
 
-  // Sync study plan to localStorage
-  useEffect(() => {
-    localStorage.setItem('study_plan', JSON.stringify(studyPlan));
-  }, [studyPlan]);
-
   // Sync study plan metadata to localStorage
   useEffect(() => {
     localStorage.setItem('study_plan_metadata', JSON.stringify(studyPlanMetadata));
   }, [studyPlanMetadata]);
+
+  // Sync study sessions to localStorage
+  useEffect(() => {
+    localStorage.setItem('study_sessions', JSON.stringify(studySessions));
+  }, [studySessions]);
+
+  // Event-based daily refresh system using lastActiveDate and visibility/focus checks
+  const [currentDateStr, setCurrentDateStr] = useState(() => new Date().toISOString().split('T')[0]);
+
+  const checkDailyReset = useCallback(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const lastActive = localStorage.getItem('last_active_date');
+    if (lastActive && lastActive !== today) {
+      setCurrentDateStr(today);
+      showToast("Welcome back! Today's study agenda has been updated.", "info");
+    }
+    localStorage.setItem('last_active_date', today);
+  }, [showToast]);
+
+  useEffect(() => {
+    checkDailyReset();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkDailyReset();
+      }
+    };
+    const handleFocus = () => {
+      checkDailyReset();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [checkDailyReset]);
 
   // Actions
   const toggleTheme = useCallback(() => {
@@ -191,23 +214,40 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const nextCompleted = !task.completed;
 
     if (nextCompleted) {
-      setStudyHistory(history => history.map((item, idx) => {
-        if (idx === history.length - 1) { // Add to current day
-          return { ...item, hours: Math.min(12, item.hours + Number(task.estimatedHours || 1)) };
-        }
-        return item;
-      }));
+      // Auto-log a study session for the task's estimated duration
+      const durationMin = Math.round((task.estimatedHours || 1) * 60);
+      const newSession: StudySession = {
+        id: `session-task-${task.id}`,
+        subject: task.subject,
+        durationMinutes: durationMin,
+        date: currentDateStr,
+        timestamp: new Date().toISOString()
+      };
+      setStudySessions(prev => [newSession, ...prev]);
+
+      setTasks(prev => prev.map(t => t.id === id ? { 
+        ...t, 
+        completed: true, 
+        completedAt: currentDateStr 
+      } : t));
       showToast('Task completed! Study hours logged.', 'success');
     } else {
+      // Remove any auto-logged session matching this task
+      setStudySessions(prev => prev.filter(s => s.id !== `session-task-${task.id}`));
+
+      setTasks(prev => prev.map(t => t.id === id ? { 
+        ...t, 
+        completed: false, 
+        completedAt: undefined 
+      } : t));
       showToast('Task marked active.', 'info');
     }
-
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: nextCompleted } : t));
-  }, [tasks, showToast]);
+  }, [tasks, currentDateStr, showToast]);
 
   const deleteTask = useCallback((id: string) => {
     const target = tasks.find(t => t.id === id);
     if (target) {
+      setStudySessions(prev => prev.filter(s => s.id !== `session-task-${id}`));
       showToast(`Task deleted: "${target.title}"`, 'info');
     }
     setTasks(prev => prev.filter(task => task.id !== id));
@@ -269,7 +309,7 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else if (textLower.includes('chemistry') || textLower.includes('organic')) {
       const intros = [
         "Organic Chemistry Chapter 4 covers electrophilic additions.",
-        "We need to tackle electrophilic reaction mechanisms for your Chemistry review.",
+        "We need to tackle electrophilic reaction mechanisms for your Chemistry Chapter 4 review.",
         "To master Chapter 4 Organic Chemistry, visualizing step-by-step pathways is crucial."
       ];
       const details = [
@@ -355,6 +395,35 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setPlannerInput(input);
   }, []);
 
+  const addStudySession = useCallback((session: Omit<StudySession, 'id' | 'timestamp'>) => {
+    const newSession: StudySession = {
+      id: `session-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      ...session
+    };
+    setStudySessions(prev => [newSession, ...prev]);
+    showToast(`Logged ${session.durationMinutes} min of ${session.subject}!`, 'success');
+  }, [showToast]);
+
+  const addSubject = useCallback((subject: string) => {
+    if (!subject) return;
+    setPlannerInput(prev => {
+      if (prev.subjects.includes(subject)) return prev;
+      showToast(`Subject added: ${subject}`, 'success');
+      return { ...prev, subjects: [...prev.subjects, subject] };
+    });
+  }, [showToast]);
+
+  const deleteSubject = useCallback((subject: string) => {
+    setPlannerInput(prev => {
+      const nextSubjects = prev.subjects.filter(s => s !== subject);
+      const nextExamDates = { ...prev.examDates };
+      delete nextExamDates[subject];
+      showToast(`Subject removed: ${subject}`, 'info');
+      return { ...prev, subjects: nextSubjects, examDates: nextExamDates };
+    });
+  }, [showToast]);
+
   const togglePlanTaskComplete = useCallback((dateStr: string, taskId: string) => {
     const day = studyPlan.find(d => d.date === dateStr);
     const task = day?.tasks.find(t => t.id === taskId);
@@ -362,36 +431,177 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const nextCompleted = !task.completed;
 
     if (nextCompleted) {
-      setStudyHistory(history => history.map((item, idx) => {
-        if (idx === history.length - 1) { // Add to current day
-          return { ...item, hours: Math.min(12, item.hours + Number(task.estimatedHours || 1)) };
+      const durationMin = Math.round((task.estimatedHours || 1) * 60);
+      const newSession: StudySession = {
+        id: `session-plan-${taskId}`,
+        subject: task.subject,
+        durationMinutes: durationMin,
+        date: dateStr,
+        timestamp: new Date().toISOString()
+      };
+      setStudySessions(prev => [newSession, ...prev]);
+      
+      setStudyPlan(prev => prev.map(d => {
+        if (d.date === dateStr) {
+          return {
+            ...d,
+            tasks: d.tasks.map(t => t.id === taskId ? { ...t, completed: true, completedAt: dateStr } : t)
+          };
         }
-        return item;
+        return d;
       }));
       showToast('Revision task completed! Streak updated.', 'success');
     } else {
+      setStudySessions(prev => prev.filter(s => s.id !== `session-plan-${taskId}`));
+      setStudyPlan(prev => prev.map(d => {
+        if (d.date === dateStr) {
+          return {
+            ...d,
+            tasks: d.tasks.map(t => t.id === taskId ? { ...t, completed: false, completedAt: undefined } : t)
+          };
+        }
+        return d;
+      }));
       showToast('Revision task marked active.', 'info');
     }
-
-    setStudyPlan(prev => prev.map(d => {
-      if (d.date === dateStr) {
-        return {
-          ...d,
-          tasks: d.tasks.map(t => t.id === taskId ? { ...t, completed: nextCompleted } : t)
-        };
-      }
-      return d;
-    }));
   }, [studyPlan, showToast]);
 
-  // Dynamic calculated stats
+  // Dynamic calculations from studySessions
+  const studyHistory = useMemo(() => {
+    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    
+    // Find start of current calendar week (Monday)
+    const today = new Date(currentDateStr);
+    const currentDay = today.getDay(); // 0 Sunday, 1 Monday, etc.
+    const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - daysToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    return daysOfWeek.map((day, index) => {
+      const target = new Date(monday);
+      target.setDate(monday.getDate() + index);
+      const dateStr = target.toISOString().split('T')[0];
+
+      const minutes = studySessions
+        .filter(s => s.date === dateStr)
+        .reduce((sum, s) => sum + s.durationMinutes, 0);
+
+      return {
+        day,
+        hours: Number((minutes / 60).toFixed(1))
+      };
+    });
+  }, [studySessions, currentDateStr]);
+
+  const streakCount = useMemo(() => {
+    const activeDates = new Set<string>();
+    
+    // Completed custom tasks
+    tasks.forEach(t => {
+      if (t.completed && t.completedAt) activeDates.add(t.completedAt);
+    });
+
+    // Completed AI plan tasks
+    studyPlan.forEach(day => {
+      day.tasks.forEach(t => {
+        if (t.completed && t.completedAt) activeDates.add(t.completedAt);
+      });
+    });
+
+    // Logged study sessions
+    studySessions.forEach(s => {
+      activeDates.add(s.date);
+    });
+
+    if (activeDates.size === 0) return 0;
+
+    let streak = 0;
+    const checkDate = new Date(currentDateStr);
+
+    const formatDate = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dayStr = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dayStr}`;
+    };
+
+    if (activeDates.has(formatDate(checkDate))) {
+      while (activeDates.has(formatDate(checkDate))) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      }
+    } else {
+      checkDate.setDate(checkDate.getDate() - 1);
+      if (activeDates.has(formatDate(checkDate))) {
+        while (activeDates.has(formatDate(checkDate))) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+      }
+    }
+
+    return streak;
+  }, [tasks, studyPlan, studySessions, currentDateStr]);
+
+  const overallProgress = useMemo(() => {
+    const last7Days: string[] = [];
+    const temp = new Date(currentDateStr);
+    for (let i = 0; i < 7; i++) {
+      const y = temp.getFullYear();
+      const m = String(temp.getMonth() + 1).padStart(2, '0');
+      const d = String(temp.getDate()).padStart(2, '0');
+      last7Days.push(`${y}-${m}-${d}`);
+      temp.setDate(temp.getDate() - 1);
+    }
+
+    let totalItems = 0;
+    let completedItems = 0;
+
+    tasks.forEach(t => {
+      if (last7Days.includes(t.dueDate)) {
+        totalItems++;
+        if (t.completed) completedItems++;
+        if (t.revisionBlocks) {
+          totalItems += t.revisionBlocks.length;
+          if (t.completed) completedItems += t.revisionBlocks.length;
+        }
+      }
+    });
+
+    studyPlan.forEach(day => {
+      if (last7Days.includes(day.date)) {
+        day.tasks.forEach(t => {
+          totalItems++;
+          if (t.completed) completedItems++;
+          if (t.revisionBlocks) {
+            totalItems += t.revisionBlocks.length;
+            if (t.completed) completedItems += t.revisionBlocks.length;
+          }
+        });
+      }
+    });
+
+    studySessions.forEach(s => {
+      if (last7Days.includes(s.date)) {
+        totalItems++;
+        completedItems++;
+      }
+    });
+
+    if (totalItems === 0) return 0;
+    return Math.round((completedItems / totalItems) * 100);
+  }, [tasks, studyPlan, studySessions, currentDateStr]);
+
+  // Derived tasks completion rate stats
   const totalTasks = tasks.length;
   const completedTasksCount = tasks.filter(t => t.completed).length;
   const pendingTasksCount = totalTasks - completedTasksCount;
   const completionPercentage = totalTasks > 0 ? Math.round((completedTasksCount / totalTasks) * 100) : 0;
-
-  // Study hours this week sum
-  const totalStudyHoursThisWeek = studyHistory.reduce((sum, item) => sum + item.hours, 0).toFixed(1);
+  
+  const totalStudyHoursThisWeek = useMemo(() => {
+    return studyHistory.reduce((sum, item) => sum + item.hours, 0).toFixed(1);
+  }, [studyHistory]);
 
   const contextValue = useMemo(() => ({
     theme,
@@ -412,6 +622,13 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     pendingTasksCount,
     completionPercentage,
     totalStudyHoursThisWeek,
+    studySessions,
+    addStudySession,
+    streakCount,
+    overallProgress,
+    currentDateStr,
+    addSubject,
+    deleteSubject,
     plannerInput,
     savePlannerInput,
     studyPlan,
@@ -438,6 +655,13 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     pendingTasksCount,
     completionPercentage,
     totalStudyHoursThisWeek,
+    studySessions,
+    addStudySession,
+    streakCount,
+    overallProgress,
+    currentDateStr,
+    addSubject,
+    deleteSubject,
     plannerInput,
     savePlannerInput,
     studyPlan,

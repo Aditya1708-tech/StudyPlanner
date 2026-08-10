@@ -40,13 +40,14 @@ describe('Dashboard Component and Widget Tests', () => {
     expect(screen.getByText(/Aditya!/)).toBeInTheDocument();
 
     // Verify widgets exist
-    expect(screen.getByText('Task Completion')).toBeInTheDocument();
-    expect(screen.getByText('Hours Studied')).toBeInTheDocument();
-    expect(screen.getByText('Active Streak')).toBeInTheDocument();
+    expect(screen.getByText("Today's Tasks")).toBeInTheDocument();
+    expect(screen.getByText('Study Time Today')).toBeInTheDocument();
+    expect(screen.getByText('Current Streak')).toBeInTheDocument();
+    expect(screen.getByText('Next Exam')).toBeInTheDocument();
 
     // Verify default stats values
-    expect(screen.getByText('5 Days')).toBeInTheDocument(); // Streak default
-    expect(screen.getByText('Logged this week')).toBeInTheDocument();
+    expect(screen.getByText('0 Days')).toBeInTheDocument(); // Streak default
+    expect(screen.getByText('None')).toBeInTheDocument(); // Next exam default
   });
 
   it('should manage keyboard focus when toggling the add exam form', async () => {
