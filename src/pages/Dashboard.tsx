@@ -23,13 +23,12 @@ import {
 
 // Count-Up animation helper component
 const CountUp: React.FC<{ target: number; decimals?: number; suffix?: string }> = ({ target, decimals = 0, suffix = '' }) => {
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test') {
-    return <span>{target.toFixed(decimals)}{suffix}</span>;
-  }
-
-  const [count, setCount] = useState(0);
+  const isTest = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test';
+  const [count, setCount] = useState(isTest ? target : 0);
   
   useEffect(() => {
+    if (isTest) return;
+
     let start = 0;
     const end = target;
     if (start === end) {
@@ -57,7 +56,11 @@ const CountUp: React.FC<{ target: number; decimals?: number; suffix?: string }> 
     }, stepTime);
     
     return () => clearInterval(timer);
-  }, [target]);
+  }, [target, isTest]);
+
+  if (isTest) {
+    return <span>{target.toFixed(decimals)}{suffix}</span>;
+  }
 
   return <span>{count.toFixed(decimals)}{suffix}</span>;
 };
