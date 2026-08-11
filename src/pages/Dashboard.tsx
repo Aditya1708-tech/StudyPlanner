@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useStudy } from '../context/StudyContext';
+import { Task } from '../types';
 import Sidebar from '../components/layout/Sidebar';
 import GlassCard from '../components/ui/GlassCard';
 import AnimatedPage from '../components/layout/AnimatedPage';
