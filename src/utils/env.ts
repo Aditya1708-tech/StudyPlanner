@@ -14,14 +14,21 @@ export const ENV = {
  * Logs developer-friendly warning in development if configuration is missing.
  */
 export const validateEnv = (): boolean => {
-  if (!ENV.GEMINI_API_KEY) {
+  const key = ENV.GEMINI_API_KEY;
+  if (!key || key === 'demo-api-key') {
     if (ENV.isDev) {
       logger.warn(
-        'VITE_GEMINI_API_KEY is missing. ' +
-        'Please add VITE_GEMINI_API_KEY to your .env file. ' +
-        'Currently using the local fallback scheduler.'
+        'VITE_GEMINI_API_KEY is missing or is placeholder. ' +
+        'Currently running in Demo Mode with local fallback scheduler.'
       );
     }
+    return false;
+  }
+  if (!key.startsWith('AIzaSy')) {
+    logger.warn(
+      'VITE_GEMINI_API_KEY is invalid (should start with "AIzaSy"). ' +
+      'Falling back to Demo Mode.'
+    );
     return false;
   }
   return true;

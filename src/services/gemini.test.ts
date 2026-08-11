@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { validateStudyPlan, generateLocalFallbackPlan, fetchStudyPlanFromGemini } from './gemini';
+import { validateStudyPlan, generateLocalFallbackPlan, fetchStudyPlanFromGemini, fetchChatResponseFromGemini } from './gemini';
 import { PlannerInput } from '../types';
 import { ENV } from '../utils/env';
 
@@ -102,7 +102,7 @@ describe('Gemini Study Plan Service Tests', () => {
           totalHours += task.estimatedHours;
         });
         
-        expect(totalHours).toBeLessThanOrEqual(mockInput.dailyHours);
+        expect(totalHours).toBeLessThanOrEqual(mockInput.dailyHours!);
       });
     });
   });
@@ -319,6 +319,67 @@ describe('Gemini Study Plan Service Tests', () => {
                          res1.metadata.studyStrategy !== res3.metadata.studyStrategy ||
                          res1.schedule[0].tasks[0].title !== res3.schedule[0].tasks[0].title;
       expect(diffOutput).toBe(true);
+    });
+  });
+
+  describe('fetchChatResponseFromGemini', () => {
+    beforeEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('should throw an error if API key is missing or is the placeholder demo key', async () => {
+      ENV.GEMINI_API_KEY = '';
+      await expect(fetchChatResponseFromGemini([], 'hello')).rejects.toThrow(
+        'Gemini API key is not configured or in demo mode.'
+      );
+
+      ENV.GEMINI_API_KEY = 'demo-api-key';
+      await expect(fetchChatResponseFromGemini([], 'hello')).rejects.toThrow(
+        'Gemini API key is not configured or in demo mode.'
+      );
+    });
+
+    it('should make fetch call, parse valid JSON reply, and return result', async () => {
+      ENV.GEMINI_API_KEY = 'valid-mock-key';
+      
+      const mockAIResponse = {
+        reply: 'Chemistry is the study of matter and reactions.',
+        suggestedTasks: [
+          { title: 'Read Chapter 4 Reactions', subject: 'Chemistry', priority: 'High', estimatedHours: 1.5 }
+        ]
+      };
+
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: JSON.stringify(mockAIResponse) }] } }]
+        })
+      } as Response);
+
+      const history = [
+        { id: '1', sender: 'user' as const, text: 'Hello', timestamp: new Date().toISOString() }
+      ];
+      
+      const result = await fetchChatResponseFromGemini(history, 'Tell me about Chemistry');
+      
+      expect(result.reply).toBe('Chemistry is the study of matter and reactions.');
+      expect(result.suggestedTasks?.[0].title).toBe('Read Chapter 4 Reactions');
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw error if API returns malformed JSON', async () => {
+      ENV.GEMINI_API_KEY = 'valid-mock-key';
+
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'invalid-json' }] } }]
+        })
+      } as Response);
+
+      await expect(fetchChatResponseFromGemini([], 'hello')).rejects.toThrow(
+        'Invalid response format received from Gemini API'
+      );
     });
   });
 

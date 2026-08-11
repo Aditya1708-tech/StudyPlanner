@@ -194,7 +194,7 @@ const Assistant: React.FC = () => {
 
                         {/* Content bubble */}
                         <div className="space-y-3.5">
-                          <div className={`px-4.5 py-3 rounded-2xl text-sm font-medium leading-relaxed ${
+                          <div className={`px-4.5 py-3 rounded-2xl text-sm font-medium leading-relaxed whitespace-pre-wrap ${
                             msg.sender === 'user'
                               ? 'bg-gradient-to-tr from-primary-600 to-indigo-650 text-white rounded-tr-none shadow-md'
                               : 'bg-surface-primary dark:bg-surface-primary border border-border-primary/50 dark:border-border-primary/60 rounded-tl-none text-slate-750 dark:text-slate-250 shadow-sm'

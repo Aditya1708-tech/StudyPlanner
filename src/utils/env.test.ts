@@ -30,4 +30,41 @@ describe('Environment Config Unit Tests', () => {
     ENV.GEMINI_API_KEY = originalKey;
     warnSpy.mockRestore();
   });
+
+  it('should return false for validateEnv if key is "demo-api-key"', () => {
+    const originalKey = ENV.GEMINI_API_KEY;
+    ENV.GEMINI_API_KEY = 'demo-api-key';
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+    const result = validateEnv();
+    expect(result).toBe(false);
+
+    ENV.GEMINI_API_KEY = originalKey;
+    warnSpy.mockRestore();
+  });
+
+  it('should return false for validateEnv if key does not start with "AIzaSy"', () => {
+    const originalKey = ENV.GEMINI_API_KEY;
+    ENV.GEMINI_API_KEY = 'invalid-key-no-prefix';
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+    const result = validateEnv();
+    expect(result).toBe(false);
+    expect(warnSpy).toHaveBeenCalled();
+
+    ENV.GEMINI_API_KEY = originalKey;
+    warnSpy.mockRestore();
+  });
+
+  it('should return true for validateEnv if key starts with "AIzaSy"', () => {
+    const originalKey = ENV.GEMINI_API_KEY;
+    ENV.GEMINI_API_KEY = 'AIzaSy_valid_mock_key';
+    const warnSpy = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+    const result = validateEnv();
+    expect(result).toBe(true);
+
+    ENV.GEMINI_API_KEY = originalKey;
+    warnSpy.mockRestore();
+  });
 });

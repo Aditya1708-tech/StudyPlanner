@@ -3,6 +3,9 @@ import { Task, Exam, ChatMessage, PlannerInput, StudyDay, StudyPlanMetadata, Stu
 import { useToast } from './ToastContext';
 import { getSimpleHash, SeededRandom } from '../utils/random';
 import { AuthContext } from './AuthContext';
+import { fetchChatResponseFromGemini } from '../services/gemini';
+import { ENV } from '../utils/env';
+import { logger } from '../utils/logger';
 
 interface StudyContextType {
   theme: string;
@@ -41,6 +44,16 @@ interface StudyContextType {
   studyPlanMetadata: StudyPlanMetadata | null;
   setStudyPlanMetadata: React.Dispatch<React.SetStateAction<StudyPlanMetadata | null>>;
   togglePlanTaskComplete: (dateStr: string, taskId: string) => void;
+
+  // Gemini Diagnostics additions
+  diagnostics: {
+    apiKeyDetected: boolean;
+    modelReachable: boolean;
+    networkAvailable: boolean;
+    lastStatus: 'success' | 'failure' | 'none';
+    lastResponseTime: number | null;
+  };
+  triggerDiagnosticsCheck: () => Promise<void>;
 }
 
 const StudyContext = createContext<StudyContextType | undefined>(undefined);
@@ -62,8 +75,15 @@ const defaultMessages: ChatMessage[] = [
 
 const defaultPlannerInput: PlannerInput = {
   subjects: [],
-  examDates: {},
-  dailyHours: 4
+  syllabuses: {},
+  exams: {},
+  availability: {
+    dailyHours: 4,
+    preferredTime: 'Morning',
+    sessionLength: 50,
+    weeklyOffDay: 'Sunday'
+  },
+  examDates: {}
 };
 
 // Demo Mode static data helper generators using dynamic dates relative to today
@@ -105,14 +125,27 @@ const getCuratedSessions = (): StudySession[] => [
 
 const getCuratedPlannerInput = (): PlannerInput => ({
   subjects: ['Chemistry', 'Calculus III', 'Physics II', 'Linear Algebra', 'Organic Chemistry'],
+  syllabuses: {},
+  exams: {
+    'Chemistry': { date: getRelativeDateStr(4), type: 'Midterm', difficulty: 'Medium', priority: 'High' },
+    'Calculus III': { date: getRelativeDateStr(12), type: 'Final', difficulty: 'Hard', priority: 'High' },
+    'Physics II': { date: getRelativeDateStr(6), type: 'University', difficulty: 'Medium', priority: 'Medium' },
+    'Linear Algebra': { date: getRelativeDateStr(8), type: 'Competitive', difficulty: 'Medium', priority: 'Low' },
+    'Organic Chemistry': { date: getRelativeDateStr(10), type: 'Final', difficulty: 'Hard', priority: 'High' }
+  },
+  availability: {
+    dailyHours: 4,
+    preferredTime: 'Morning',
+    sessionLength: 50,
+    weeklyOffDay: 'Sunday'
+  },
   examDates: {
     'Chemistry': getRelativeDateStr(4),
     'Calculus III': getRelativeDateStr(12),
     'Physics II': getRelativeDateStr(6),
     'Linear Algebra': getRelativeDateStr(8),
     'Organic Chemistry': getRelativeDateStr(10)
-  },
-  dailyHours: 4
+  }
 });
 
 const getCuratedStudyPlan = (): StudyDay[] => [
@@ -222,6 +255,84 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const saved = localStorage.getItem('study_plan_metadata');
     return saved ? JSON.parse(saved) : null;
   });
+
+  // Gemini Diagnostics state
+  const [diagnostics, setDiagnostics] = useState(() => {
+    const key = ENV.GEMINI_API_KEY;
+    const hasKey = !!key && key !== 'demo-api-key';
+    return {
+      apiKeyDetected: hasKey,
+      modelReachable: false,
+      networkAvailable: typeof navigator !== 'undefined' ? navigator.onLine : true,
+      lastStatus: 'none' as 'success' | 'failure' | 'none',
+      lastResponseTime: null as number | null
+    };
+  });
+
+  // Keep network status updated dynamically
+  useEffect(() => {
+    const handleNetworkChange = () => {
+      setDiagnostics(prev => ({
+        ...prev,
+        networkAvailable: navigator.onLine
+      }));
+    };
+    window.addEventListener('online', handleNetworkChange);
+    window.addEventListener('offline', handleNetworkChange);
+    return () => {
+      window.removeEventListener('online', handleNetworkChange);
+      window.removeEventListener('offline', handleNetworkChange);
+    };
+  }, []);
+
+  const triggerDiagnosticsCheck = useCallback(async () => {
+    const key = ENV.GEMINI_API_KEY;
+    const hasKey = !!key && key !== 'demo-api-key';
+    const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+
+    if (!hasKey) {
+      setDiagnostics(prev => ({
+        ...prev,
+        apiKeyDetected: false,
+        modelReachable: false,
+        networkAvailable: isOnline
+      }));
+      return;
+    }
+
+    const startTime = Date.now();
+    try {
+      const model = "gemini-2.5-flash"; 
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: "ping" }] }],
+            generationConfig: { maxOutputTokens: 5 }
+          })
+        }
+      );
+
+      const elapsed = Date.now() - startTime;
+      setDiagnostics({
+        apiKeyDetected: true,
+        modelReachable: response.ok,
+        networkAvailable: isOnline,
+        lastStatus: response.ok ? 'success' : 'failure',
+        lastResponseTime: elapsed
+      });
+    } catch {
+      setDiagnostics({
+        apiKeyDetected: true,
+        modelReachable: false,
+        networkAvailable: isOnline,
+        lastStatus: 'failure',
+        lastResponseTime: null
+      });
+    }
+  }, []);
 
   // Demo state active transitions
   useEffect(() => {
@@ -445,7 +556,26 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setExams(prev => prev.filter(exam => exam.id !== id));
   }, [exams, showToast]);
 
-  const generateAIResponse = useCallback((userText: string) => {
+  const generateAIResponse = useCallback(async (userText: string, currentHistory: ChatMessage[]) => {
+    const apiKey = ENV.GEMINI_API_KEY;
+    if (apiKey && apiKey !== 'demo-api-key') {
+      try {
+        const response = await fetchChatResponseFromGemini(currentHistory, userText);
+        const aiMsg: ChatMessage = {
+          id: `msg-${Date.now() + 1}`,
+          sender: 'ai',
+          text: response.reply,
+          timestamp: new Date().toISOString(),
+          suggestedTasks: response.suggestedTasks
+        };
+        setMessages(prev => [...prev, aiMsg]);
+        return;
+      } catch (err) {
+        logger.error("Error generating live AI response, falling back to demo mode:", err);
+      }
+    }
+
+    // FALLBACK / DEMO MODE
     const textLower = userText.toLowerCase();
     
     // Seeded randomness for dynamic replies in demo mode
@@ -553,14 +683,16 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       text,
       timestamp: new Date().toISOString()
     };
-    setMessages(prev => [...prev, newMsg]);
+    
+    const updated = [...messages, newMsg];
+    setMessages(updated);
 
     if (sender === 'user') {
       setTimeout(() => {
-        generateAIResponse(text);
+        generateAIResponse(text, updated);
       }, 1000);
     }
-  }, [generateAIResponse]);
+  }, [generateAIResponse, messages]);
 
   const clearChatHistory = useCallback(() => {
     setMessages(defaultMessages);
@@ -810,7 +942,9 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setStudyPlan,
     studyPlanMetadata,
     setStudyPlanMetadata,
-    togglePlanTaskComplete
+    togglePlanTaskComplete,
+    diagnostics,
+    triggerDiagnosticsCheck
   }), [
     theme,
     toggleTheme,
@@ -843,7 +977,9 @@ export const StudyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setStudyPlan,
     studyPlanMetadata,
     setStudyPlanMetadata,
-    togglePlanTaskComplete
+    togglePlanTaskComplete,
+    diagnostics,
+    triggerDiagnosticsCheck
   ]);
 
   return (

@@ -76,7 +76,8 @@ const Dashboard: React.FC = () => {
     plannerInput,
     addSubject,
     studyPlan,
-    togglePlanTaskComplete
+    togglePlanTaskComplete,
+    studyPlanMetadata
   } = useStudy();
 
   const [showExamForm, setShowExamForm] = useState(false);
@@ -223,6 +224,18 @@ const Dashboard: React.FC = () => {
   const hasPlan = studyPlan.length > 0;
   const showOnboarding = !hasSubjects || !hasExams || !hasPlan;
 
+  const totalGeneratedTasks = useMemo(() => {
+    return studyPlan.reduce((acc, day) => acc + day.tasks.length, 0);
+  }, [studyPlan]);
+
+  const completedGeneratedTasks = useMemo(() => {
+    return studyPlan.reduce((acc, day) => acc + day.tasks.filter(t => t.completed).length, 0);
+  }, [studyPlan]);
+  
+  const completionPercent = useMemo(() => {
+    return totalGeneratedTasks > 0 ? Math.round((completedGeneratedTasks / totalGeneratedTasks) * 100) : 0;
+  }, [totalGeneratedTasks, completedGeneratedTasks]);
+
   // Dynamic AI study assistant text
   const aiAssistantText = useMemo(() => {
     if (plannerInput.subjects.length === 0) {
@@ -235,24 +248,57 @@ const Dashboard: React.FC = () => {
       return "Nice job. You have configured your subjects and exams. Run the AI Planner now to generate daily revision blocks and structured schedules.";
     }
 
-    const taskCount = todayAllTasks.length;
-    const pendingCount = todayAllTasks.filter(t => !t.completed).length;
-
-    if (nextExam) {
-      const daysLeft = getDaysRemaining(nextExam.date);
-      const isUrgent = daysLeft <= 3;
-      
-      let text = `You have ${taskCount} task${taskCount !== 1 ? 's' : ''} scheduled for today and ${pendingCount} pending items. `;
-      if (isUrgent) {
-        text += `Your "${nextExam.name}" is coming up in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}! I highly recommend focusing on ${nextExam.subject} today. Spend some time reviewing core reaction mechanisms or integrals.`;
-      } else {
-        text += `Your next milestone is "${nextExam.name}" in ${daysLeft} days. I recommend tackling high priority tasks for ${nextExam.subject} to spread out your prep workload.`;
-      }
-      return text;
+    const remainingPct = 100 - completionPercent;
+    
+    // Find next upcoming topic
+    let upcomingTopic = "N/A";
+    const pendingTasks = studyPlan.reduce((acc, d) => {
+      return [...acc, ...d.tasks.filter(t => !t.completed)];
+    }, [] as Task[]);
+    if (pendingTasks.length > 0) {
+      upcomingTopic = pendingTasks[0].topic || pendingTasks[0].title;
     }
 
-    return `You have ${taskCount} task${taskCount !== 1 ? 's' : ''} scheduled today. Ensure you log study sessions to keep your ${streakCount}-day streak active!`;
-  }, [plannerInput.subjects, exams, studyPlan, todayAllTasks, nextExam, streakCount]);
+    // Completion Forecast message
+    const estCompletion = studyPlanMetadata?.estimatedCompletionDate || '';
+    let forecastMsg = "";
+    if (estCompletion) {
+      const completionDate = new Date(estCompletion);
+      const today = new Date(currentDateStr);
+      const daysDiff = Math.ceil((completionDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (nextExam) {
+        const examDate = new Date(nextExam.date);
+        const bufferDays = Math.ceil((examDate.getTime() - completionDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (bufferDays >= 0) {
+          forecastMsg = `Estimated to finish all topics on ${estCompletion} (${bufferDays} buffer days before exam).`;
+        } else {
+          forecastMsg = `⚠️ Attention: Your current study pace finishes the syllabus ${Math.abs(bufferDays)} days AFTER your exam. We suggest increasing your daily available study hours.`;
+        }
+      } else {
+        forecastMsg = `Estimated syllabus completion date is ${estCompletion} (in ${daysDiff} days).`;
+      }
+    }
+
+    // Recommendation track check
+    let recommendation = "";
+    const today = new Date(currentDateStr);
+    const overdueCount = studyPlan.reduce((acc, d) => {
+      const dDate = new Date(d.date);
+      if (dDate < today) {
+        return acc + d.tasks.filter(t => !t.completed).length;
+      }
+      return acc;
+    }, 0);
+
+    if (overdueCount > 0) {
+      recommendation = `⚠️ You are behind by ${overdueCount} study topic${overdueCount !== 1 ? 's' : ''}. We recommend adding an extra 1.5h revision slot today to catch up!`;
+    } else {
+      recommendation = `✅ On Track! You have completed all scheduled topics. Study "${upcomingTopic}" next to maintain consistency.`;
+    }
+
+    return `Syllabus Remaining: ${remainingPct}%. Upcoming Review Target: "${upcomingTopic}". ${forecastMsg} ${recommendation}`;
+  }, [plannerInput.subjects, exams, studyPlan, studyPlanMetadata, nextExam, streakCount, completionPercent, currentDateStr]);
 
   // Derived calendar grid logic
   const getDaysInMonth = (date: Date) => {
@@ -681,6 +727,45 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </GlassCard>
+
+          {/* Syllabus Roadmap Insight Panel */}
+          {studyPlan.length > 0 && (
+            <GlassCard hover={false} className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-left border border-brand-primary/20 bg-gradient-to-tr from-brand-primary/5 to-transparent">
+              <div className="space-y-1 md:border-r border-border-primary/50 dark:border-slate-800 pr-4">
+                <span className="text-[10px] font-black uppercase tracking-wider text-text-muted dark:text-text-secondary">Upcoming Review Target</span>
+                <h4 className="font-heading font-black text-sm text-text-primary dark:text-slate-100 truncate">
+                  {studyPlan.reduce((acc, d) => [...acc, ...d.tasks.filter(t => !t.completed)], [] as Task[])[0]?.topic || 'Syllabus Complete! 🎉'}
+                </h4>
+                <p className="text-[10px] font-semibold text-text-secondary dark:text-text-muted">Next scheduled topic</p>
+              </div>
+
+              <div className="space-y-1 md:border-r border-border-primary/50 dark:border-slate-800 pr-4">
+                <span className="text-[10px] font-black uppercase tracking-wider text-text-muted dark:text-text-secondary">Syllabus Remaining</span>
+                <h4 className="font-heading font-black text-sm text-text-primary dark:text-slate-100 flex items-center gap-1.5">
+                  <span>{100 - completionPercent}%</span>
+                  <span className="text-[10px] font-semibold text-text-muted">({completionPercent}% completed)</span>
+                </h4>
+                <div className="h-1.5 w-full bg-bg-primary dark:bg-slate-800 rounded-full overflow-hidden border border-border-primary/20 mt-1">
+                  <div className="h-full bg-gradient-to-r from-brand-primary to-pink-500 rounded-full" style={{ width: `${completionPercent}%` }} />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-wider text-text-muted dark:text-text-secondary">Milestone Forecast</span>
+                <h4 className="font-heading font-black text-xs text-text-primary dark:text-slate-100 truncate">
+                  {studyPlanMetadata?.estimatedCompletionDate ? `Finish on ${studyPlanMetadata.estimatedCompletionDate}` : 'Timeline pending'}
+                </h4>
+                <p className="text-[9.5px] font-semibold text-brand-primary leading-tight">
+                  {nextExam && studyPlanMetadata?.estimatedCompletionDate ? (
+                    (() => {
+                      const buffer = Math.ceil((new Date(nextExam.date).getTime() - new Date(studyPlanMetadata.estimatedCompletionDate).getTime()) / (1000 * 60 * 60 * 24));
+                      return buffer >= 0 ? `✓ ${buffer} buffer days prior to exam` : `⚠️ Overdue: finishes ${Math.abs(buffer)} days after exam`;
+                    })()
+                  ) : 'Continuous study track'}
+                </p>
+              </div>
+            </GlassCard>
+          )}
 
           {/* Core Content Layout Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

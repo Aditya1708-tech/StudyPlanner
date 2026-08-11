@@ -25,6 +25,21 @@
   
   --color-border-primary: #E5E7EB;
 
+  /* Custom primary color palette (brand purple) */
+  --color-primary-50: #f5f3ff;
+  --color-primary-100: #ede9fe;
+  --color-primary-200: #ddd6fe;
+  --color-primary-300: #c4b5fd;
+  --color-primary-400: #a78bfa;
+  --color-primary-500: #6D4AFF;
+  --color-primary-600: #5A39F0;
+  --color-primary-650: #4B2CDD;
+  --color-primary-700: #3C20C2;
+  --color-primary-800: #2E179E;
+  --color-primary-900: #1F0E78;
+  --color-primary-950: #10064F;
+  --color-indigo-650: #3b2fc9;
+
   /* Spacing Grid Overrides (Tailwind by default uses 0.25rem = 4px steps, we keep standard ratios) */
   --radius-xl: 12px;   /* Inputs */
   --radius-2xl: 16px;  /* Secondary cards */
@@ -49,6 +64,21 @@
   --color-text-muted: #94A3B8;
   
   --color-border-primary: #1F2937;
+
+  /* Dark mode overrides for primary palette to match dark brand purple */
+  --color-primary-50: #1e1b4b;
+  --color-primary-100: #312e81;
+  --color-primary-200: #3730a3;
+  --color-primary-300: #4338ca;
+  --color-primary-400: #4f46e5;
+  --color-primary-500: #8B7CFF;
+  --color-primary-600: #7462FF;
+  --color-primary-650: #5D4BEE;
+  --color-primary-700: #4634DD;
+  --color-primary-800: #3020C0;
+  --color-primary-900: #1F109A;
+  --color-primary-950: #100670;
+  --color-indigo-650: #2b1eb9;
 }
 
 /* Base resets and overrides */

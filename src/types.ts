@@ -9,6 +9,12 @@ export interface Task {
   isGenerated?: boolean;
   revisionBlocks?: string[];
   completedAt?: string;
+  
+  // Upgraded syllabus fields
+  sessionType?: 'Study' | 'Revision' | 'Practical' | 'Mock Test';
+  topic?: string;
+  weekNum?: number;
+  dayNum?: number;
 }
 
 export interface StudySession {
@@ -35,10 +41,47 @@ export interface ChatMessage {
   suggestedTasks?: Omit<Task, 'id' | 'completed'>[];
 }
 
+export interface SubjectSyllabus {
+  subject: string;
+  fileName: string;
+  fileSize: number;
+  extractedText: string;
+  structuredSyllabus?: ExtractedSyllabus;
+}
+
+export interface ExtractedSyllabus {
+  units: {
+    unitName: string;
+    chapters: {
+      chapterName: string;
+      topics: string[];
+    }[];
+  }[];
+  practicals: string[];
+  revisions: string[];
+}
+
+export interface ExamDetails {
+  date: string;
+  type: 'Midterm' | 'Final' | 'University' | 'Competitive';
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  priority: 'High' | 'Medium' | 'Low';
+}
+
+export interface Availability {
+  dailyHours: number;
+  preferredTime: 'Morning' | 'Afternoon' | 'Evening';
+  sessionLength: number; // e.g. 25, 50, 90 mins
+  weeklyOffDay: string; // e.g. "Sunday" or "None"
+}
+
 export interface PlannerInput {
   subjects: string[];
-  examDates: Record<string, string>;
-  dailyHours: number;
+  syllabuses?: Record<string, SubjectSyllabus>;
+  exams?: Record<string, ExamDetails>;
+  availability?: Availability;
+  examDates?: Record<string, string>; // Legacy support mapping
+  dailyHours?: number; // Legacy support
 }
 
 export interface StudyDay {
@@ -53,6 +96,14 @@ export interface StudyPlanMetadata {
   estimatedDifficulty: 'easy' | 'medium' | 'hard';
   motivationalIntro?: string;
   studyStrategy?: string;
+  
+  // Upgraded metadata tracking
+  riskAreas?: string[];
+  estimatedCompletionDate?: string;
+  recommendedRevisionInterval?: string;
+  pomodoroStructure?: string;
+  finalWeekStrategy?: string;
+  syllabusesParsed?: Record<string, ExtractedSyllabus>;
 }
 
 export interface StudyPlanResult {
